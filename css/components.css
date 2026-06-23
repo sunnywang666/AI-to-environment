@@ -374,8 +374,8 @@ input[type="range"].caliber::-moz-range-thumb {
 
 /* ---- 粒子场景：canvas + 字幕 ---- */
 .escal-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
-/* 底部暗角：让 3D 与字幕分层，不重叠 */
-.pin-stage::after {
+/* 底部暗角：仅第2段 3D 场景需要（与字幕分层）。其他 pin 场景不加，避免盖暗内容 */
+#escalation .pin-stage::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 42vh;
   background: linear-gradient(to top, var(--ink) 12%, rgba(12,14,17,.7) 50%, transparent);
   z-index: 1; pointer-events: none;
