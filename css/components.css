@@ -9,11 +9,16 @@
   background: #faf9f6;
   color: #1a1c20;
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 12vh var(--gutter) 0;
-  overflow: hidden;
+  align-items: center; justify-content: flex-start;
+  padding: 16vh var(--gutter) 16vh;   /* 顶部留白，内容随回答向下生长 */
 }
 .hero__inner { width: 100%; max-width: 720px; text-align: center; }
+
+/* 明→暗：独立的长渐变段，给回答充足空间后再慢慢变黑 */
+.hero-to-dark {
+  height: 80vh;
+  background: linear-gradient(to bottom, #faf9f6 0%, #e9e4da 22%, var(--ink) 100%);
+}
 
 .hero__eyebrow {
   font-family: var(--font-mono); font-size: .8rem; letter-spacing: .22em;
@@ -95,13 +100,6 @@
   animation: bob 2.2s var(--ease) infinite;
 }
 .hero__scroll:hover { color: var(--ember); }
-
-/* 明→暗过渡：底部渐变沉入墨黑 */
-.hero__fade {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 30vh;
-  background: linear-gradient(to bottom, rgba(250,249,246,0), var(--ink));
-  pointer-events: none;
-}
 
 @media (max-width: 640px) {
   .hero__chips button { font-size: .82rem; padding: 7px 12px; }
