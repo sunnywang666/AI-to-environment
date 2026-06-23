@@ -15,3 +15,6 @@ node_modules/
 # 本地预览服务器产物
 .parcel-cache/
 dist/
+
+# 参考资料里的大体积 PDF（仅本地阅读，不入库以免仓库臃肿）
+reference/*.pdf
