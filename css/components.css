@@ -2,6 +2,15 @@
    云的身体 · 交互组件
    ============================================================ */
 
+/* ================= 通用图表 ================= */
+.chart { width: 100%; margin: 1em 0; }
+.chart svg { display: block; overflow: visible; }
+.chart__cap {
+  font-size: .95rem; color: var(--text-dim); line-height: 1.7; margin: 1em 0 0;
+}
+.chart__cap strong { color: var(--text); }
+.chart__cap .source { display: block; margin-top: .5em; }
+
 /* ================= 开场 · 仿 AI 聊天框（浅色）================= */
 .hero {
   position: relative;
