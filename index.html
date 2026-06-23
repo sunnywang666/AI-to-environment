@@ -43,20 +43,16 @@
       <p class="lead">单次微不足道。但当它被乘以一个天文数字——往下滚，看它长成什么。</p>
     </div>
 
-    <!-- pin + scrub 场景：数字逐级放大 -->
+    <!-- pin + scrub 场景：粒子聚集成形（滚动驱动状态变化）-->
     <div class="pin-scene" id="escalation">
       <div class="pin-stage">
-        <div class="escal">
-          <div class="escal__viz" id="escViz"></div>
+        <canvas class="escal-canvas" id="escCanvas"></canvas>
+        <div class="escal-caption">
           <div class="escal__op" id="escOp"></div>
-          <div class="escal__num"><span id="escNum">0.3</span><span class="unit" id="escUnit">Wh</span></div>
-          <div class="escal__label" id="escLabel">一次查询</div>
-          <div class="escal__cmp" id="escCmp">≈ 微波炉运行 1 秒</div>
-          <div class="escal__track">
-            <div class="escal__fill" id="escFill"></div>
-            <div class="escal__ticks" id="escTicks"></div>
-          </div>
+          <div class="escal__big" id="escBig">0.3 Wh</div>
+          <div class="escal__label" id="escLabel">一次查询 · 约等于微波炉运行 1 秒</div>
         </div>
+        <div class="escal-cue" id="escCue">继续向下滚动 ↓</div>
       </div>
     </div>
 

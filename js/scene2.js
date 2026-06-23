@@ -1,147 +1,195 @@
 /* ============================================================
-   云的身体 · 第2段「数字逐级放大」(GSAP ScrollTrigger · pin+scrub)
-   每一级配一张可识别的参照插画 + 显性的乘法关系：
-   一次查询(微波炉) → ×25亿(城市) → ×365(住宅区) → 全球(国家对比条)
+   云的身体 · 第2段「粒子聚集成形」(GSAP ScrollTrigger · pin+scrub)
+   滚动驱动状态变化：
+   一个光点(一次查询) → 爆增成 25 亿次的粒子海(一天)
+   → 压缩成方阵(一年) → 飞成数字「448」(全球 ≈ 法国)
    ============================================================ */
 
-const STAGES = [
-  { v: 0.3,  unit: "Wh",  label: "一次查询",            cmp: "≈ 微波炉运行 1 秒",        op: "",                viz: "micro", logWh: Math.log10(0.3),     tick: "一次" },
-  { v: 0.75, unit: "GWh", label: "GPT 一天",            cmp: "≈ 一座小城市一天的用电",   op: "× 25 亿次 / 天",  viz: "city",  logWh: Math.log10(0.75e9),  tick: "一天" },
-  { v: 274,  unit: "GWh", label: "GPT 一年",            cmp: "≈ 数十万户家庭一年的电",   op: "× 365 天",        viz: "homes", logWh: Math.log10(274e9),   tick: "一年" },
-  { v: 448,  unit: "TWh", label: "2025 · 全球所有数据中心", cmp: "≈ 法国全国一年的用电，超过除前 10 名外所有国家", op: "＋ 全世界的数据中心", viz: "bars", logWh: Math.log10(448e12), tick: "全球" },
-];
-
-const COUNTRIES = [
-  { name: "数据中心", val: 448, dc: true },
-  { name: "法国",     val: 445 },
-  { name: "英国",     val: 310 },
-  { name: "阿根廷",   val: 135 },
-];
-
-const LOG_MIN = Math.log10(0.3);
-const LOG_MAX = Math.log10(448e12);
-const easeOut = (t) => 1 - Math.pow(1 - t, 3);
-
-const HOME_SVG =
-  '<span class="home"><svg viewBox="0 0 18 18"><path d="M9 1.5 L16.5 8 H14 V16.5 H4 V8 H1.5 Z" fill="currentColor"/></svg></span>';
-
-function buildViz(box) {
-  // 微波炉
-  const micro = `
-    <div class="viz viz-micro" data-viz="micro">
-      <svg viewBox="0 0 220 140" width="240" height="150">
-        <rect x="8" y="14" width="204" height="112" rx="9" fill="none" stroke="#4A4E57" stroke-width="3"/>
-        <rect x="22" y="28" width="132" height="84" rx="5" fill="rgba(245,183,49,.10)" stroke="#4A4E57" stroke-width="2"/>
-        <circle cx="88" cy="70" r="11" fill="#F5B731"/>
-        <rect x="166" y="30" width="36" height="80" rx="4" fill="none" stroke="#4A4E57" stroke-width="2"/>
-        <circle cx="184" cy="48" r="3.5" fill="#8A8E96"/>
-        <rect x="174" y="62" width="20" height="6" rx="2" fill="#2A2D34"/>
-        <rect x="174" y="74" width="20" height="6" rx="2" fill="#2A2D34"/>
-      </svg>
-    </div>`;
-
-  // 城市天际线
-  const heights = [40, 72, 56, 96, 64, 120, 80, 52, 88, 60];
-  const city = `<div class="viz viz-city" data-viz="city">${heights
-    .map((h) => `<div class="bldg" style="height:${h}px"></div>`)
-    .join("")}</div>`;
-
-  // 住宅区（48 户象征“数十万户”）
-  const homes = `<div class="viz viz-homes" data-viz="homes">${HOME_SVG.repeat(48)}</div>`;
-
-  // 国家对比条
-  const max = Math.max(...COUNTRIES.map((c) => c.val));
-  const bars = `<div class="viz viz-bars" data-viz="bars">${COUNTRIES.map(
-    (c) => `
-      <div class="cbar ${c.dc ? "is-dc" : ""}">
-        <span class="cname">${c.name}</span>
-        <span class="ctrack"><span class="cfill" data-w="${(c.val / max) * 100}"></span></span>
-        <span class="cval">${c.val}<small> TWh</small></span>
-      </div>`
-  ).join("")}</div>`;
-
-  box.innerHTML = micro + city + homes + bars;
-}
+const N = 1400;
+const easeIn = (t) => t * t;
+const map = (v, a, b, c, d) => c + ((v - a) / (b - a)) * (d - c);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
 export function initScene2() {
   const scene = document.getElementById("escalation");
   if (!scene) return;
+  const canvas = document.getElementById("escCanvas");
+  const ctx = canvas.getContext("2d");
+  const opEl = document.getElementById("escOp");
+  const bigEl = document.getElementById("escBig");
+  const labelEl = document.getElementById("escLabel");
+  const cueEl = document.getElementById("escCue");
+
   const hasGSAP = !!(window.gsap && window.ScrollTrigger);
   if (hasGSAP) gsap.registerPlugin(ScrollTrigger);
 
-  const numEl = document.getElementById("escNum");
-  const unitEl = document.getElementById("escUnit");
-  const labelEl = document.getElementById("escLabel");
-  const cmpEl = document.getElementById("escCmp");
-  const opEl = document.getElementById("escOp");
-  const fillEl = document.getElementById("escFill");
-  const vizBox = document.getElementById("escViz");
-  const ticksBox = document.getElementById("escTicks");
+  let W = 0, H = 0, dpr = 1;
+  let particles = [];
+  let swarm = [], grid = [], textT = [];
+  let p = 0;
+  let cueHidden = false;
+  let lastPhase = -1;
 
-  buildViz(vizBox);
-  const vizEls = [...vizBox.querySelectorAll(".viz")];
-  const vizByKey = Object.fromEntries(vizEls.map((el) => [el.dataset.viz, el]));
+  function sampleText(text, n, w, h) {
+    w = Math.max(2, Math.floor(w));
+    h = Math.max(2, Math.floor(h));
+    const off = document.createElement("canvas");
+    off.width = w; off.height = h;
+    const c = off.getContext("2d");
+    c.fillStyle = "#fff";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    const fs = Math.min(h * 0.62, w * 0.42);
+    c.font = `900 ${fs}px "Roboto Mono", ui-monospace, monospace`;
+    c.fillText(text, w / 2, h * 0.46);
+    const data = c.getImageData(0, 0, w, h).data;
+    const pts = [];
+    const step = 4;
+    for (let y = 0; y < h; y += step)
+      for (let x = 0; x < w; x += step)
+        if (data[(y * w + x) * 4 + 3] > 128) pts.push([x, y]);
+    const res = [];
+    if (!pts.length) {
+      for (let i = 0; i < n; i++) res.push({ x: w / 2, y: h / 2 });
+      return res;
+    }
+    for (let i = 0; i < n; i++) {
+      const q = pts[(Math.random() * pts.length) | 0];
+      res.push({ x: q[0] + (Math.random() - 0.5) * step, y: q[1] + (Math.random() - 0.5) * step });
+    }
+    return res;
+  }
 
-  const tickEls = STAGES.map((s) => {
-    const pos = (s.logWh - LOG_MIN) / (LOG_MAX - LOG_MIN);
-    const t = document.createElement("div");
-    t.className = "escal__tick";
-    t.style.left = pos * 100 + "%";
-    t.innerHTML = `<i></i><span>${s.tick}</span>`;
-    ticksBox.appendChild(t);
-    return t;
+  function buildTargets() {
+    // 粒子海：中心向外的圆形分布
+    swarm = [];
+    for (let i = 0; i < N; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const rad = Math.pow(Math.random(), 0.7);
+      swarm.push({
+        x: W / 2 + Math.cos(a) * rad * W * 0.46,
+        y: H / 2 + Math.sin(a) * rad * H * 0.42,
+      });
+    }
+    // 方阵
+    const aspect = W / H || 1.6;
+    let cols = Math.max(1, Math.round(Math.sqrt(N * aspect)));
+    const gw = Math.min(W * 0.62, cols * 16);
+    const cell = gw / cols;
+    const rows = Math.ceil(N / cols);
+    const gh = rows * cell;
+    const sx = (W - gw) / 2 + cell / 2;
+    const sy = (H - gh) / 2 + cell / 2;
+    grid = [];
+    for (let i = 0; i < N; i++) {
+      const r = Math.floor(i / cols);
+      const col = i % cols;
+      grid.push({ x: sx + col * cell, y: sy + r * cell });
+    }
+    // 数字「448」
+    textT = sampleText("448", N, W, H);
+  }
+
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!particles.length)
+      for (let i = 0; i < N; i++) particles.push({ x: W / 2, y: H / 2 });
+    buildTargets();
+  }
+
+  function phaseOf(pp) {
+    return pp < 0.2 ? 0 : pp < 0.5 ? 1 : pp < 0.78 ? 2 : 3;
+  }
+
+  function updateCaption() {
+    const ph = phaseOf(p);
+    if (ph === 1) {
+      // 实时计数到 25 亿
+      const c = clamp(map(p, 0.2, 0.5, 0, 2.5e9), 0, 2.5e9);
+      bigEl.textContent = (c / 1e8).toFixed(1) + " 亿次";
+    } else if (ph !== lastPhase) {
+      if (ph === 0) bigEl.textContent = "0.3 Wh";
+      else if (ph === 2) bigEl.textContent = "274 GWh";
+      else bigEl.textContent = "448 TWh";
+    }
+    if (ph !== lastPhase) {
+      const OPS = ["", "× 25 亿次 / 天", "× 365 天", "＋ 全世界的数据中心"];
+      const LBL = [
+        "一次查询 · 约等于微波炉运行 1 秒",
+        "GPT 一天 · 每一个光点，都是一次提问",
+        "GPT 一年 · 约等于数十万户家庭的用电",
+        "2025 全球数据中心 · ≈ 法国全国，超过除前 10 名外所有国家",
+      ];
+      opEl.textContent = OPS[ph];
+      opEl.classList.toggle("show", ph > 0);
+      labelEl.textContent = LBL[ph];
+      lastPhase = ph;
+    }
+    if (p > 0.04 && !cueHidden) {
+      cueHidden = true;
+      cueEl.classList.add("hide");
+    }
+  }
+
+  function setP(np) {
+    p = np;
+    updateCaption();
+  }
+
+  function frame(t) {
+    requestAnimationFrame(frame);
+    const rect = scene.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight || W === 0) return;
+
+    ctx.clearRect(0, 0, W, H);
+    const ph = phaseOf(p);
+
+    let active = N;
+    if (ph === 0) active = 1;
+    else if (ph === 1) active = Math.max(1, Math.round(easeIn(clamp((p - 0.2) / 0.3, 0, 1)) * N));
+
+    const targets = ph === 1 ? swarm : ph === 2 ? grid : ph === 3 ? textT : null;
+    const lf = ph === 3 ? 0.18 : 0.1;
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = "rgba(245,183,49,0.85)";
+
+    for (let i = 0; i < active; i++) {
+      const pt = particles[i];
+      let tx, ty, r;
+      if (ph === 0) {
+        tx = W / 2; ty = H / 2;
+        r = 9 + Math.sin(t / 300) * 2.2;
+      } else {
+        const tg = targets[i];
+        tx = tg.x; ty = tg.y;
+        if (ph === 1) {
+          tx += Math.sin(t / 900 + i) * 7;
+          ty += Math.cos(t / 1100 + i * 1.3) * 7;
+        }
+        r = 1.7;
+      }
+      pt.x += (tx - pt.x) * lf;
+      pt.y += (ty - pt.y) * lf;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, r, 0, 6.2832);
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  resize();
+  requestAnimationFrame(frame);
+  window.addEventListener("resize", resize);
+  window.addEventListener("load", () => {
+    resize();
+    if (hasGSAP) ScrollTrigger.refresh();
   });
-
-  let activeStage = -1;
-  let countId = null;
-  let barsShown = false;
-
-  const fmt = (v) =>
-    v < 10 ? v.toFixed(2).replace(/\.?0+$/, "") : Math.round(v).toLocaleString();
-
-  function countTo(target, unit) {
-    if (countId) cancelAnimationFrame(countId);
-    const t0 = performance.now();
-    unitEl.textContent = unit;
-    (function step(now) {
-      const e = easeOut(Math.min(1, (now - t0) / 500));
-      numEl.textContent = fmt(target * e);
-      if (e < 1) countId = requestAnimationFrame(step);
-      else numEl.textContent = fmt(target);
-    })(performance.now());
-  }
-
-  function showBars() {
-    if (barsShown) return;
-    barsShown = true;
-    vizBox.querySelectorAll(".cfill").forEach((f, i) => {
-      setTimeout(() => (f.style.width = f.dataset.w + "%"), 120 * i);
-    });
-  }
-
-  function setStage(i) {
-    if (i === activeStage) return;
-    activeStage = i;
-    const s = STAGES[i];
-
-    vizEls.forEach((el) => el.classList.remove("on"));
-    vizByKey[s.viz].classList.add("on");
-
-    opEl.textContent = s.op;
-    opEl.classList.toggle("show", !!s.op);
-
-    labelEl.textContent = s.label;
-    cmpEl.textContent = s.cmp;
-    countTo(s.v, s.unit);
-    tickEls.forEach((t, k) => t.classList.toggle("on", k <= i));
-
-    if (s.viz === "bars") showBars();
-  }
-
-  function render(p) {
-    fillEl.style.width = (p * 100).toFixed(1) + "%";
-    setStage(Math.min(STAGES.length - 1, Math.floor(p * STAGES.length)));
-  }
 
   if (hasGSAP) {
     ScrollTrigger.create({
@@ -149,9 +197,8 @@ export function initScene2() {
       start: "top top",
       end: "bottom bottom",
       scrub: true,
-      onUpdate: (self) => render(self.progress),
+      onUpdate: (self) => setP(self.progress),
     });
-    window.addEventListener("load", () => ScrollTrigger.refresh());
   } else {
     let ticking = false;
     function onScroll() {
@@ -161,13 +208,11 @@ export function initScene2() {
         ticking = false;
         const r = scene.getBoundingClientRect();
         const denom = r.height - window.innerHeight;
-        const p = denom > 0 ? Math.min(1, Math.max(0, -r.top / denom)) : 0;
-        render(p);
+        setP(denom > 0 ? clamp(-r.top / denom, 0, 1) : 0);
       });
     }
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
   }
 
-  render(0);
+  setP(0);
 }
