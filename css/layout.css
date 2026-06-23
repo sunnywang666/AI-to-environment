@@ -15,7 +15,8 @@ body {
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  /* 用 clip 而非 hidden：clip 不会创建滚动容器，不会破坏子元素 position:sticky */
+  overflow-x: clip;
 }
 
 /* ---------- 段落容器 ---------- */

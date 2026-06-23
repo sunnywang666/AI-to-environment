@@ -17,8 +17,9 @@ const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
 export function initScene2() {
   const scene = document.getElementById("escalation");
-  if (!scene || !window.gsap || !window.ScrollTrigger) return;
-  gsap.registerPlugin(ScrollTrigger);
+  if (!scene) return;
+  const hasGSAP = !!(window.gsap && window.ScrollTrigger);
+  if (hasGSAP) gsap.registerPlugin(ScrollTrigger);
 
   const numEl = document.getElementById("escNum");
   const unitEl = document.getElementById("escUnit");
@@ -81,14 +82,33 @@ export function initScene2() {
     setStage(Math.min(STAGES.length - 1, Math.floor(p * STAGES.length)));
   }
 
-  ScrollTrigger.create({
-    trigger: scene,
-    start: "top top",
-    end: "bottom bottom",
-    scrub: true,
-    onUpdate: (self) => render(self.progress),
-    onRefreshInit: () => render(0),
-  });
+  if (hasGSAP) {
+    ScrollTrigger.create({
+      trigger: scene,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: true,
+      onUpdate: (self) => render(self.progress),
+    });
+    // 字体/图片加载后布局会变，刷新一次触发点
+    window.addEventListener("load", () => ScrollTrigger.refresh());
+  } else {
+    // 兜底：不依赖 GSAP，直接用滚动位置算进度
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const r = scene.getBoundingClientRect();
+        const denom = r.height - window.innerHeight;
+        const p = denom > 0 ? Math.min(1, Math.max(0, -r.top / denom)) : 0;
+        render(p);
+      });
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+  }
 
   render(0);
 }
