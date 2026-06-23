@@ -83,6 +83,51 @@ export function initRanking() {
   window.addEventListener("resize", () => { if (host.querySelector("svg")) draw(); });
 }
 
+export function initBills() {
+  const mount = document.getElementById("bills-mount");
+  if (!mount) return;
+  mount.classList.remove("placeholder");
+  mount.innerHTML = `
+    <div class="equiv" id="equivViz">
+      <div class="equiv__one">
+        <div class="equiv__dc"></div>
+        <p>1 座数据中心<br><span>600 兆瓦</span></p>
+      </div>
+      <div class="equiv__arrow">＝</div>
+      <div class="equiv__many">
+        <div class="equiv__dots" id="equivDots"></div>
+        <p><span class="e-text" id="equivNum">0</span> 户家庭的用电</p>
+      </div>
+    </div>
+    <p class="chart__cap">账单暴涨是多因素叠加——老旧燃煤、气价、极端天气、电网维护、费率结构。
+    数据中心<strong>不是唯一元凶，却是压在脆弱电网上、增长最快的那块新增重量</strong>。
+    <span class="source">每个点≈200 户；600MW≈10 万户（PBS/AP）</span></p>`;
+
+  const dotsBox = mount.querySelector("#equivDots");
+  const numEl = mount.querySelector("#equivNum");
+  const COLS = 30, ROWS = 17; // 510 点 ≈ 10 万户
+  for (let i = 0; i < COLS * ROWS; i++) {
+    const d = document.createElement("i");
+    d.style.transitionDelay = (i * 2.2) + "ms";
+    dotsBox.appendChild(d);
+  }
+  const dots = [...dotsBox.children];
+
+  function run() {
+    dots.forEach((d) => d.classList.add("on"));
+    const t0 = performance.now();
+    (function step(now) {
+      const e = Math.min(1, (now - t0) / 1400);
+      numEl.textContent = Math.round(100000 * (1 - Math.pow(1 - e, 3))).toLocaleString();
+      if (e < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+  const io = new IntersectionObserver((es) => {
+    es.forEach(e => { if (e.isIntersecting) { run(); io.disconnect(); } });
+  }, { threshold: 0.3 });
+  io.observe(dotsBox);
+}
+
 export function initJevons() {
   const mount = document.getElementById("ending-mount");
   if (!mount || !window.d3) return;

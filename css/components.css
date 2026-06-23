@@ -2,6 +2,42 @@
    云的身体 · 交互组件
    ============================================================ */
 
+/* ================= 第4段 等量代换：1座数据中心 = 10万户 ================= */
+.equiv {
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(16px, 4vw, 48px); flex-wrap: wrap; margin: 2em 0 1em;
+}
+.equiv__one { text-align: center; }
+.equiv__dc {
+  width: 64px; height: 80px; margin: 0 auto 10px; border-radius: 6px;
+  background: linear-gradient(160deg, #ffd9a0, var(--energy));
+  box-shadow: 0 0 22px rgba(245,183,49,.55);
+  position: relative;
+}
+.equiv__dc::before {
+  content: ""; position: absolute; inset: 10px 12px; border-radius: 3px;
+  background-image: repeating-linear-gradient(var(--ink-2) 0 3px, transparent 3px 9px);
+  opacity: .5;
+}
+/* 纸白段内的文字色 */
+.section--paper .equiv p { color: var(--text-ink); }
+.equiv p { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.4; }
+.equiv p span { font-weight: 400; font-size: .85rem; color: var(--text-ink-dim); }
+.equiv__arrow { font-family: var(--font-mono); font-size: 1.6rem; color: var(--text-ink-dim); }
+.equiv__many { text-align: center; }
+.equiv__dots {
+  display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px;
+  width: min(70vw, 320px); margin: 0 auto 10px;
+}
+.equiv__dots i {
+  width: 100%; aspect-ratio: 1; border-radius: 50%;
+  background: #c7c0b0; opacity: 0; transform: scale(.4);
+  transition: opacity .3s var(--ease), transform .3s var(--ease);
+}
+.section--ink .equiv__dots i { background: var(--carbon-line); }
+.equiv__dots i.on { opacity: .9; transform: none; }
+.equiv__many p span.e-text { font-family: var(--font-mono); }
+
 /* ================= 通用图表 ================= */
 .chart { width: 100%; margin: 1em 0; }
 .chart svg { display: block; overflow: visible; }

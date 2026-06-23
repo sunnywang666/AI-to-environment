@@ -5,7 +5,7 @@ import { initReveal } from "./reveal.js";
 import { initSlider } from "./slider.js";
 import { initScene2 } from "./scene2.js";
 import { initChat } from "./chat.js";
-import { initJevons, initRanking } from "./charts.js";
+import { initJevons, initRanking, initBills } from "./charts.js";
 
 function boot() {
   initChat();
@@ -13,6 +13,7 @@ function boot() {
   initScene2();
   initSlider();
   initRanking();
+  initBills();
   initJevons();
 }
 
