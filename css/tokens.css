@@ -1,0 +1,43 @@
+/* ============================================================
+   云的身体 · 设计 Token
+   艺术方向：热成像 · 墨黑沉浸
+   ============================================================ */
+
+:root {
+  /* ---- 底色 ---- */
+  --ink:      #0C0E11;   /* 墨黑，沉浸段主背景 */
+  --ink-2:    #14171C;   /* 卡片 / 分层 */
+  --ink-3:    #1C2026;   /* 更亮一层描边/分隔 */
+  --paper:    #F4F1EA;   /* 暖纸白，编辑文字段 */
+
+  /* ---- 文字 ---- */
+  --text:     #ECEAE3;   /* 暗底正文 */
+  --text-dim: #8A8E96;   /* 注释 / 来源 */
+  --text-ink: #1A1C20;   /* 纸白段正文 */
+  --text-ink-dim: #5A5E66;
+
+  /* ---- 三维度编码（全片复用，含义恒定）---- */
+  --energy:   #F5B731;   /* 电 · 电流琥珀 */
+  --water:    #3FB6C8;   /* 水 · 冷青 */
+  --carbon:   #2A2D34;   /* 碳 · 石墨 */
+  --carbon-line: #4A4E57;/* 碳在暗底上的描边 */
+
+  /* ---- 警示：极度克制，仅第4段「人的代价」---- */
+  --ember:    #E5533C;   /* 余烬红 */
+
+  /* ---- 数据状态 ---- */
+  --projected: rgba(245, 183, 49, .45); /* 预测值=半透明 */
+
+  /* ---- 排版尺度 ---- */
+  --reading-width: 680px;
+  --gutter: clamp(20px, 5vw, 80px);
+
+  /* ---- 字体 ---- */
+  --font-display: "Noto Sans SC", "思源黑体", "Source Han Sans SC", system-ui, sans-serif;
+  --font-serif:   "Noto Serif SC", "思源宋体", "Source Han Serif SC", serif;
+  --font-mono:    "Roboto Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* ---- 运动 ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur:  600ms;
+}

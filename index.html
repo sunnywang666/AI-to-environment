@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>云的身体 · AI 的能源代价</title>
+  <meta name="description" content="你问了 AI 一个问题，有一件看不见的事正在发生。一部关于 AI 能源与环境代价的数据新闻长卷。" />
+
+  <!-- 字体：思源黑体(Noto Sans SC) / 思源宋体(Noto Serif SC) / Roboto Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Noto+Serif+SC:wght@400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- 样式 -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/scrolly.css" />
+</head>
+<body>
+
+  <!-- ============ 第 1 段 · 一次点击 ============ -->
+  <section class="section section--ink" id="s1" data-chapter="1">
+    <div class="reading">
+      <p class="kicker">第一段 · 一次点击</p>
+      <h1 class="title">你问了 AI<br>一个问题</h1>
+      <p class="lead">有一件看不见的事，正在发生。</p>
+      <p>微波炉嗡了一秒，一瓶水被倒空了——但你什么都没看见。AI 的"干净感"是精心设计的结果：没有烟囱、没有排气管，连加载都只是一个旋转的小圆点。</p>
+
+      <!-- 任务4：开场估算器将替换此占位 -->
+      <div class="placeholder" id="estimator-mount">[ 互动开场 · prompt 估算器 — 任务4 实现 ]</div>
+
+      <p class="lead">但 0.3 瓦时几乎等于零。一瓶水也不值一提。<br>所以——<strong>凭什么这件事需要你关心？</strong></p>
+    </div>
+    <div class="scroll-hint">向下滚动 ↓</div>
+  </section>
+
+  <!-- ============ 第 2 段 · 一个国家的胃口 ============ -->
+  <section class="section section--ink" id="s2" data-chapter="2">
+    <div class="reading">
+      <p class="kicker">第二段 · 一个国家的胃口</p>
+      <h2 class="section-title">把它乘以 25 亿次</h2>
+      <p>单次微不足道。但 GPT 每天约 25 亿次提问，加上所有其他 AI 系统——总量就是一个国家，甚至不是一个小国。</p>
+
+      <p class="monument" data-count="448">448<span class="unit">TWh / 年</span></p>
+      <p>2025 年全球数据中心用电，<span class="measured">超过除前 10 名外所有国家</span>。</p>
+
+      <div class="legend">
+        <span><i class="e"></i> 电 Energy</span>
+        <span><i class="w"></i> 水 Water</span>
+        <span><i class="c"></i> 碳 Carbon</span>
+      </div>
+
+      <!-- 任务5：虚拟国家用电排行 Hero 图 -->
+      <div class="placeholder" id="ranking-mount">[ Hero 图 · "数据中心"插入真实国家用电排行 — 任务5 实现 ]</div>
+
+      <p class="lead">一个国家级的胃口。但一个国家的能源消耗是均匀分散在国土上的——<br><strong>数据中心的不是。那它们在哪里？</strong></p>
+    </div>
+  </section>
+
+  <!-- ============ 第 3 段 · 云有一个邮编 ============ -->
+  <section class="section section--ink" id="s3" data-chapter="3">
+    <div class="reading">
+      <p class="kicker">第三段 · 云有一个邮编</p>
+      <h2 class="section-title">把弥散的云<br>钉到经纬度上</h2>
+      <p>数据中心高度集中在少数几个地方——而且正在向你想不到的地方扩张。中美双线在这里开始交替。</p>
+    </div>
+
+    <!-- 任务6：中美双联地图 + 水压力图层 -->
+    <div class="placeholder" id="maps-mount">[ 中美双联地图 · 集群位置叠加缺水图层 — 任务6 实现 ]</div>
+
+    <div class="reading">
+      <p class="lead">它们建在那里了。那——<strong>住在那里的人，怎么样了？</strong></p>
+    </div>
+  </section>
+
+  <!-- ============ 第 4 段 · 账单 ============ -->
+  <section class="section section--paper" id="s4" data-chapter="4">
+    <div class="reading">
+      <p class="kicker">第四段 · 账单</p>
+      <h2 class="section-title">有人正在<br>为此买单</h2>
+      <p>从地图缩进到人的面孔：电费账单、水源被占、生活方式被改变。同一个模式，在两个截然不同的社会里同时发生。</p>
+
+      <!-- 任务7：多因素拆解 + 双人物卡 -->
+      <div class="placeholder" id="bills-mount">[ 多因素拆解图 + 中美双人物故事卡 — 任务7 实现 ]</div>
+
+      <p class="lead">看起来问题很严重。但到底有多严重？你会发现——<br><strong>连这个问题本身，我们都没法回答。</strong></p>
+    </div>
+  </section>
+
+  <!-- ============ 第 5 段 · 蒙眼布 ============ -->
+  <section class="section section--ink" id="s5" data-chapter="5">
+    <div class="reading">
+      <p class="kicker">第五段 · 蒙眼布</p>
+      <h2 class="section-title">同一件事<br>数字相差一千倍</h2>
+      <p>不是因为有人在撒谎，而是因为没有人被要求说真话。同一次查询的用水，从 0.32 毫升到 519 毫升——取决于你把边界画在哪里。</p>
+
+      <!-- 任务3：口径滑块（明星交互）-->
+      <div class="placeholder" id="slider-mount">[ 核心互动 · 口径滑块 0.3ml→519ml — 任务3 实现 ]</div>
+
+      <p class="lead">我们享受了 AI 的便利——每个人都享受了。但为它付电费的、提供水源的、腾出土地的，是另一些人。<br><strong>如果收益是全球共享的、成本是本地集中的——这笔交易公平吗？</strong></p>
+    </div>
+  </section>
+
+  <!-- ============ 第 6 段 · 这笔交易公平吗 ============ -->
+  <section class="section section--ink" id="s6" data-chapter="6">
+    <div class="reading">
+      <p class="kicker">第六段 · 这笔交易公平吗</p>
+      <h2 class="section-title">这笔交易<br>公平吗？</h2>
+      <p>不做末日论，也不做洗白。AI 当前的能耗占比仍不大（全球电力的 1.5%）——真正的问题是增长曲线、分配不公、和治理缺位。</p>
+
+      <!-- 任务8：杰文斯双轴折线 + 收尾估算器回收 -->
+      <div class="placeholder" id="ending-mount">[ 杰文斯悖论双轴折线 + 三杠杆 + 估算器回收 — 任务8 实现 ]</div>
+
+      <p class="lead">我们拿到了便利。那么——<br><strong>我们是否亏欠了电线另一端的人？</strong></p>
+      <p class="source">数据来源：MIT Technology Review · UNU-INWEH · IEA · UC Riverside · Carbon Brief · 国家发改委 · 北京理工大学 等（详见各段标注）</p>
+    </div>
+  </section>
+
+  <!-- 贯穿小圆点（through-line glyph）·任务2 接管 -->
+  <div class="glyph" id="glyph" aria-hidden="true" style="position:fixed;right:24px;bottom:24px;z-index:50;"></div>
+
+  <!-- 库 CDN（任务2/5/6 使用）-->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/scrollama@3"></script>
+  <script src="js/main.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+/* ============================================================
+   云的身体 · 布局与基础排版
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* ---------- 段落容器 ---------- */
+.section {
+  position: relative;
+  padding: 14vh var(--gutter);
+}
+
+/* 沉浸段（墨黑）/ 编辑段（纸白）交替 */
+.section--ink   { background: var(--ink);  color: var(--text); }
+.section--paper { background: var(--paper); color: var(--text-ink); }
+.section--paper .meta,
+.section--paper .source { color: var(--text-ink-dim); }
+
+/* 阅读窄栏 */
+.reading {
+  max-width: var(--reading-width);
+  margin: 0 auto;
+}
+
+/* ---------- 标题 ---------- */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 1.4em;
+}
+.section--paper .kicker { color: var(--text-ink-dim); }
+
+h1.title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  line-height: 1.04;
+  letter-spacing: -.01em;
+  margin: 0 0 .5em;
+}
+
+h2.section-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+  margin: 0 0 .8em;
+}
+
+p { margin: 0 0 1.3em; }
+.lead { font-size: 1.18rem; }
+
+/* ---------- 纪念碑大数字 ---------- */
+.monument {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(3.2rem, 12vw, 9rem);
+  line-height: .95;
+  letter-spacing: -.02em;
+  display: inline-block;
+}
+.monument .unit {
+  font-size: .28em;
+  letter-spacing: .04em;
+  color: var(--text-dim);
+  margin-left: .25em;
+}
+
+/* ---------- 三维度图例 ---------- */
+.legend {
+  display: flex;
+  gap: 1.6em;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  letter-spacing: .04em;
+  margin: 2em 0;
+}
+.legend span { display: inline-flex; align-items: center; gap: .5em; }
+.legend i {
+  width: 12px; height: 12px; border-radius: 2px; display: inline-block;
+}
+.legend .e { background: var(--energy); }
+.legend .w { background: var(--water); }
+.legend .c { background: var(--carbon); border: 1px solid var(--carbon-line); }
+
+/* 行内维度强调 */
+.e-text { color: var(--energy); }
+.w-text { color: var(--water); }
+.ember-text { color: var(--ember); }
+
+/* ---------- 来源标注 ---------- */
+.source {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--text-dim);
+  letter-spacing: .03em;
+  margin-top: 2em;
+}
+
+/* ---------- 数据状态：实测 vs 预测 ---------- */
+.measured  { border-bottom: 2px solid currentColor; }
+.projected { border-bottom: 2px dashed var(--projected); opacity: .8; }
+
+/* ---------- 占位标记（任务1阶段，后续替换）---------- */
+.placeholder {
+  margin: 2.5em 0;
+  padding: 2.5em;
+  border: 1px dashed var(--ink-3);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: .85rem;
+  text-align: center;
+}
+.section--paper .placeholder { border-color: #d8d2c4; color: var(--text-ink-dim); }
+
+/* ---------- 滚动提示 ---------- */
+.scroll-hint {
+  position: absolute;
+  bottom: 6vh; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: .72rem; letter-spacing: .2em;
+  color: var(--text-dim);
+  animation: bob 2.2s var(--ease) infinite;
+}
+@keyframes bob { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,8px)} }
+
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .section { padding: 10vh var(--gutter); }
+}

@@ -1,0 +1,51 @@
+/* ============================================================
+   云的身体 · Scrollytelling 结构（sticky 图 + 滚动文字）
+   任务2 会在此基础上接入 Scrollama；任务1 先放好骨架样式。
+   ============================================================ */
+
+/* sticky 图形容器 + 滚动文字步骤 的通用结构 */
+.scrolly {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+/* 左：sticky 图形 */
+.scrolly__graphic {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 右：滚动文字步骤 */
+.scrolly__steps { padding: 30vh var(--gutter); }
+.step {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: .35;
+  transition: opacity var(--dur) var(--ease);
+}
+.step.is-active { opacity: 1; }
+
+/* 贯穿小圆点（through-line glyph）占位 */
+.glyph {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--text-dim);
+  border-top-color: var(--energy);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .scrolly { grid-template-columns: 1fr; }
+  .scrolly__graphic { height: 60vh; }
+  .scrolly__steps { padding: 4vh var(--gutter); }
+  .step { min-height: 50vh; }
+}
