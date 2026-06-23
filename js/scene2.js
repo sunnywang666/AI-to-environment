@@ -116,8 +116,8 @@ export function initScene2() {
     const g = new THREE.Group();
     const cab = M({ color: 0x1b1e23, metalness: 0.6, roughness: 0.5 });
     const unit = M({ color: 0x2b3038, metalness: 0.5, roughness: 0.55 });
-    const led = M({ color: 0x101316, emissive: 0xf5b731, emissiveIntensity: 0.9 });
-    const led2 = M({ color: 0x101316, emissive: 0x3fb6c8, emissiveIntensity: 0.9 });
+    const led = M({ color: 0x101316, emissive: 0xf5b731, emissiveIntensity: 0.95 });
+    const led2 = M({ color: 0x101316, emissive: 0xf5b731, emissiveIntensity: 0.4 });
     addBox(g, 6, 11, 5.5, 0, 0, 0, cab);                  // 柜体
     for (let i = 0; i < 16; i++) {
       const y = 4.6 - i * 0.62;
@@ -137,9 +137,9 @@ export function initScene2() {
   }
   function buildPlant() {
     const g = new THREE.Group();
-    const concrete = M({ color: 0x8d929a, metalness: 0.1, roughness: 0.9 });
-    const dark = M({ color: 0x3a3f47, metalness: 0.3, roughness: 0.8 });
-    const steamMat = M({ color: 0xdfe6ea, metalness: 0, roughness: 1, opacity: 0.5 });
+    const concrete = M({ color: 0x2e333b, metalness: 0.62, roughness: 0.45, emissive: 0xf5b731, emissiveIntensity: 0.05 });
+    const dark = M({ color: 0x3a3f48, metalness: 0.55, roughness: 0.5 });
+    const steamMat = M({ color: 0xf5d79a, metalness: 0, roughness: 1, opacity: 0.45, emissive: 0xf5b731, emissiveIntensity: 0.12 });
     const profile = [[2.4, 0], [2.0, 1.6], [1.5, 3.6], [1.35, 4.6], [1.55, 6.4], [1.9, 8.2]];
     for (const [cx, h, s] of [[-2.8, 1, 1], [2.8, 0.92, 0.92]]) {
       const t = latheTower(profile.map(([x, y]) => [x * s, y * s]), concrete);
@@ -159,21 +159,41 @@ export function initScene2() {
     return g;
   }
 
-  // ---------- 地球 ----------
-  function buildEarth() {
+  // ---------- 埃菲尔铁塔（≈法国全国用电）----------
+  function buildEiffel() {
     const g = new THREE.Group();
-    const ocean = M({ color: 0x16344e, metalness: 0.1, roughness: 0.7, emissive: 0x081726, emissiveIntensity: 0.5 });
-    g.add(new THREE.Mesh(new THREE.SphereGeometry(6, 48, 32), ocean));
-    const grid = new THREE.Mesh(
-      new THREE.SphereGeometry(6.08, 24, 16),
-      new THREE.MeshBasicMaterial({ color: 0x3fb6c8, wireframe: true, transparent: true, opacity: 0.35 })
-    );
-    grid.material.userData.base = 0.35;
-    g.add(grid);
+    const metal = M({ color: 0x2b2f37, metalness: 0.72, roughness: 0.4 });
+    const lit = M({ color: 0x141414, emissive: 0xf5b731, emissiveIntensity: 0.75 });
+    const V = THREE.Vector3;
+    function strut(p1, p2, thick, mat) {
+      const dir = new V().subVectors(p2, p1);
+      const len = dir.length();
+      const m = new THREE.Mesh(new THREE.BoxGeometry(thick, len, thick), mat.clone());
+      m.position.copy(p1).add(p2).multiplyScalar(0.5);
+      m.quaternion.setFromUnitVectors(new V(0, 1, 0), dir.clone().normalize());
+      g.add(m);
+    }
+    const L = [{ y: -6.5, w: 3.2 }, { y: -2.0, w: 1.7 }, { y: 2.4, w: 0.85 }, { y: 6.2, w: 0.4 }];
+    const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+    const ring = (w, y) => [[-1, -1, 1, -1], [1, -1, 1, 1], [1, 1, -1, 1], [-1, 1, -1, -1]]
+      .map(([x1, z1, x2, z2]) => [new V(x1 * w, y, z1 * w), new V(x2 * w, y, z2 * w)]);
+    // 四条收窄的棱
+    for (const [cx, cz] of corners)
+      for (let i = 0; i < L.length - 1; i++)
+        strut(new V(cx * L[i].w, L[i].y, cz * L[i].w), new V(cx * L[i + 1].w, L[i + 1].y, cz * L[i + 1].w), 0.26, metal);
+    // 两层观景台（发光）
+    for (const li of [1, 2]) for (const [a, b] of ring(L[li].w * 1.18, L[li].y)) strut(a, b, 0.3, lit);
+    // 底部横梁（拱的暗示）
+    for (const [a, b] of ring(L[0].w, L[0].y + 1.3)) strut(a, b, 0.22, metal);
+    // 塔尖 + 顶灯
+    const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.26, 2.2, 12), metal.clone());
+    spire.position.set(0, 7.3, 0); g.add(spire);
+    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), lit.clone());
+    beacon.position.set(0, 8.5, 0); g.add(beacon);
     return g;
   }
 
-  const models = [buildMicrowave(), buildServers(), buildPlant(), buildEarth()];
+  const models = [buildMicrowave(), buildServers(), buildPlant(), buildEiffel()];
   models.forEach((m, i) => { m.userData.op = i === 0 ? 1 : 0; sceneT.add(m); });
 
   function setOpacity(group, v) {
@@ -200,7 +220,7 @@ export function initScene2() {
       const target = i === band ? 1 : 0;
       const op = m.userData.op + (target - m.userData.op) * 0.12;
       setOpacity(m, op);
-      m.scale.setScalar(0.86 + 0.14 * op);
+      m.scale.setScalar((0.86 + 0.14 * op) * 0.82);
       if (op > 0.02) m.rotation.y += 0.005;
     });
     renderer.render(sceneT, cam);
