@@ -6,6 +6,7 @@ import { initSlider } from "./slider.js";
 import { initScene2 } from "./scene2.js";
 import { initChat } from "./chat.js";
 import { initJevons, initRanking, initBills } from "./charts.js";
+import { initMaps } from "./maps.js";
 
 function boot() {
   initChat();
@@ -15,6 +16,7 @@ function boot() {
   initRanking();
   initBills();
   initJevons();
+  initMaps();
 }
 
 if (document.readyState === "loading") {

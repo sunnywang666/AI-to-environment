@@ -38,6 +38,26 @@
 .equiv__dots i.on { opacity: .9; transform: none; }
 .equiv__many p span.e-text { font-family: var(--font-mono); }
 
+/* ================= 第3段 中美双联地图 ================= */
+.maps { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; margin: 1em 0; }
+.map h4 {
+  font-family: var(--font-mono); font-size: .82rem; letter-spacing: .04em;
+  color: var(--text-dim); margin: 0 0 .4em; font-weight: 400;
+}
+.map svg { display: block; overflow: visible; }
+.maps__legend {
+  display: flex; flex-wrap: wrap; gap: 1.4em; margin: .6em 0 0;
+  font-family: var(--font-mono); font-size: .76rem; color: var(--text-dim);
+}
+.maps__legend span { display: inline-flex; align-items: center; gap: .5em; }
+.maps__legend i { width: 12px; height: 12px; display: inline-block; }
+.maps__legend .dot { background: var(--energy); border-radius: 50%; box-shadow: 0 0 6px rgba(245,183,49,.6); }
+.maps__legend .ring { border: 1.5px solid var(--water); border-radius: 50%; background: transparent; }
+.maps__legend .dry { background: #2c2519; border-radius: 2px; }
+@media (max-width: 720px) {
+  .maps { grid-template-columns: 1fr; gap: 3vh; }
+}
+
 /* ================= 通用图表 ================= */
 .chart { width: 100%; margin: 1em 0; }
 .chart svg { display: block; overflow: visible; }
