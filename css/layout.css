@@ -37,17 +37,13 @@ body {
 
 /* 沉浸段（墨黑）/ 编辑段（纸白）交替 */
 .section--ink   { background: var(--ink);  color: var(--text); }
-/* 纸白段：上下边缘渐变回墨黑，避免与相邻沉浸段硬切；内容居中落在纸白区 */
-.section--paper {
-  background: linear-gradient(
-    to bottom,
-    var(--ink) 0%,
-    var(--paper) 24%,
-    var(--paper) 76%,
-    var(--ink) 100%
-  );
-  color: var(--text-ink);
-}
+/* 纸白段用纯实色，内容永远落在实色上、清晰；墨↔纸的渐变交给独立过渡带 .band */
+.section--paper { background: var(--paper); color: var(--text-ink); }
+
+/* 段间过渡带：墨↔纸之间一段纯渐变，无文字，过渡从容 */
+.band { height: 48vh; }
+.band--ink-paper { background: linear-gradient(to bottom, var(--ink), var(--paper)); }
+.band--paper-ink { background: linear-gradient(to bottom, var(--paper), var(--ink)); }
 .section--paper .meta,
 .section--paper .source { color: var(--text-ink-dim); }
 
