@@ -1,91 +1,13 @@
 /* ============================================================
-   云的身体 · 第2段「粒子汇聚成 3D 物体」(Three.js + ScrollTrigger)
-   滚动驱动：粒子在散点与 3D 物体之间聚散，物体序列走完
-   AI(数字) → 现实(物理) → 全球 的弧线：
-   微波炉 → 城市楼群 → 电厂冷却塔 → 地球(448TWh ≈ 法国)
+   云的身体 · 第2段「真实 3D 模型」(Three.js mesh + 灯光)
+   用代码建真实 3D 模型（实体网格，非粒子拼形）：
+   微波炉 → 服务器机柜 → 电厂冷却塔 → 地球
+   数据用准确数字呈现（不拿粒子数量冒充"忠实"）。
+   滚动切换模型 + 模型自转。
    ============================================================ */
 
-const N = 4200;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const map = (v, a, b, c, d) => c + ((v - a) / (b - a)) * (d - c);
-const lerp = (a, b, t) => a + (b - a) * t;
-function smooth01(x, a, b) { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
-
-/* ---------- 3D 表面采样基元 ---------- */
-function boxPoint(cx, cy, cz, w, h, d) {
-  const A = [w * h, w * h, h * d, h * d, w * d, w * d];
-  const tot = A[0] + A[1] + A[2] + A[3] + A[4] + A[5];
-  let r = Math.random() * tot, f = 0;
-  while (r > A[f]) { r -= A[f]; f++; }
-  const u = Math.random() - 0.5, v = Math.random() - 0.5;
-  const hx = w / 2, hy = h / 2, hz = d / 2;
-  let x, y, z;
-  if (f === 0) { x = u * w; y = v * h; z = hz; }
-  else if (f === 1) { x = u * w; y = v * h; z = -hz; }
-  else if (f === 2) { x = -hx; y = v * h; z = u * d; }
-  else if (f === 3) { x = hx; y = v * h; z = u * d; }
-  else if (f === 4) { x = u * w; y = hy; z = v * d; }
-  else { x = u * w; y = -hy; z = v * d; }
-  return [cx + x, cy + y, cz + z];
-}
-function cylPoint(cx, baseY, cz, r, h) {
-  const ang = Math.random() * Math.PI * 2, t = Math.random();
-  return [cx + Math.cos(ang) * r, baseY + t * h, cz + Math.sin(ang) * r];
-}
-function towerPoint(cx, baseY, cz, h, rBot, rWaist, rTop) {
-  const t = Math.random();
-  const rr = t < 0.55 ? lerp(rBot, rWaist, t / 0.55) : lerp(rWaist, rTop, (t - 0.55) / 0.45);
-  const ang = Math.random() * Math.PI * 2;
-  return [cx + Math.cos(ang) * rr, baseY + t * h, cz + Math.sin(ang) * rr];
-}
-function spherePoint(rad) {
-  const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u);
-  return [Math.cos(a) * s * rad, u * rad, Math.sin(a) * s * rad];
-}
-
-function buildObject(parts) {
-  const arr = new Float32Array(N * 3);
-  let tot = 0; parts.forEach((p) => (tot += p.w));
-  for (let i = 0; i < N; i++) {
-    let r = Math.random() * tot, k = 0;
-    while (r > parts[k].w) { r -= parts[k].w; k++; }
-    const pt = parts[k].fn();
-    arr[i * 3] = pt[0]; arr[i * 3 + 1] = pt[1]; arr[i * 3 + 2] = pt[2];
-  }
-  return arr;
-}
-
-/* ---------- 四个物体 ---------- */
-function makeMicrowave() {
-  return buildObject([
-    { w: 60, fn: () => boxPoint(0, 0, 0, 10, 6, 7) },          // 机身
-    { w: 10, fn: () => boxPoint(-1.4, 0, 3.56, 5.4, 4.4, 0.2) }, // 门面板
-    { w: 8,  fn: () => boxPoint(3.4, 0, 3.56, 2.4, 4.6, 0.2) },  // 控制面板
-    { w: 3,  fn: () => boxPoint(2.0, 0, 3.75, 0.4, 4.2, 0.4) },  // 把手
-    { w: 4,  fn: () => {                                          // 四只脚
-        const sx = Math.random() < 0.5 ? -4.3 : 4.3, sz = Math.random() < 0.5 ? -3 : 3;
-        return boxPoint(sx, -3.4, sz, 0.6, 0.8, 0.6);
-      } },
-  ]);
-}
-function makeCity() {
-  const B = [[-4,-1.5,4],[-2,1,7],[0,-1,5],[2,1.5,9],[4,-1,6],[-3,2,8],[1,-2.5,5],[3.5,2,7],[-1,0.2,6.5]];
-  const parts = B.map(([x, z, h]) => ({
-    w: h, fn: () => boxPoint(x, -3.5 + h / 2, z, 1.5, h, 1.5),
-  }));
-  return buildObject(parts);
-}
-function makeTowers() {
-  return buildObject([
-    { w: 34, fn: () => towerPoint(-2.6, -3.5, 0, 8, 2.2, 1.4, 1.8) }, // 冷却塔1
-    { w: 30, fn: () => towerPoint(2.6, -3.5, 0, 7.2, 2.0, 1.3, 1.6) },// 冷却塔2
-    { w: 8,  fn: () => cylPoint(0, -3.5, 0, 0.45, 11) },              // 烟囱
-    { w: 14, fn: () => boxPoint(0, -3.8, 0, 11, 1, 4) },             // 厂房底座
-  ]);
-}
-function makeGlobe() {
-  return buildObject([{ w: 1, fn: () => spherePoint(6) }]);
-}
 
 export function initScene2() {
   const scene = document.getElementById("escalation");
@@ -101,8 +23,8 @@ export function initScene2() {
 
   const CAPS = [
     { op: "", big: "0.3 Wh", label: "一次查询 · 一台微波炉转 1 秒的电" },
-    { op: "× 25 亿次 / 天", big: null, label: "GPT 一天 · 加起来是一座城市的胃口" },
-    { op: "× 365 天", big: "274 GWh", label: "GPT 一年 · 要靠一座真实的电厂来喂" },
+    { op: "× 25 亿次 / 天", big: null, label: "GPT 一天 · 喂饱它的是一排排服务器" },
+    { op: "× 365 天", big: "274 GWh", label: "GPT 一年 · 要靠一座真实的电厂" },
     { op: "＋ 全世界的数据中心", big: "448 TWh", label: "2025 全球数据中心 · ≈ 法国全国用电" },
   ];
 
@@ -124,43 +46,141 @@ export function initScene2() {
   }
   function setP(np) { p = np; updateCaption(); }
 
-  if (!THREE) { fallback2D(); wireScroll(); setP(0); return; }
+  let renderer;
+  try {
+    if (!THREE) throw new Error("no THREE");
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  } catch (e) {
+    fallbackMsg();
+    wireScroll();
+    setP(0);
+    return;
+  }
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
 
-  const forms = [makeMicrowave(), makeCity(), makeTowers(), makeGlobe()];
-  const scatter = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
-    const pt = spherePoint(9 * Math.cbrt(Math.random()));
-    scatter[i * 3] = pt[0]; scatter[i * 3 + 1] = pt[1]; scatter[i * 3 + 2] = pt[2];
+  const sceneT = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+  cam.position.set(0, 1.5, 27);
+  cam.lookAt(0, 0, 0);
+
+  // 灯光
+  sceneT.add(new THREE.AmbientLight(0x4a4e57, 0.8));
+  const key = new THREE.DirectionalLight(0xfff1d4, 1.25);
+  key.position.set(8, 12, 10);
+  sceneT.add(key);
+  const rim = new THREE.DirectionalLight(0x6fa8c8, 0.5);
+  rim.position.set(-10, 4, -8);
+  sceneT.add(rim);
+
+  // ---------- 材质 ----------
+  const M = (opt) => new THREE.MeshStandardMaterial(Object.assign({ transparent: true }, opt));
+
+  function addBox(group, w, h, d, x, y, z, mat) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat.clone());
+    m.position.set(x, y, z);
+    group.add(m);
+    return m;
   }
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setClearColor(0x000000, 0);
-  const cam = new THREE.PerspectiveCamera(52, 1, 0.1, 1000);
-  cam.position.set(0, 0, 23);
-  const sceneT = new THREE.Scene();
-  const group = new THREE.Group();
-  group.position.y = 2.4;       // 上移，给底部字幕让位
-  sceneT.add(group);
+  // ---------- 微波炉 ----------
+  function buildMicrowave() {
+    const g = new THREE.Group();
+    const bodyMat = M({ color: 0x262a31, metalness: 0.55, roughness: 0.45 });
+    const panelMat = M({ color: 0x33373f, metalness: 0.4, roughness: 0.6 });
+    const glassMat = M({ color: 0x0a0d11, metalness: 0.3, roughness: 0.15, emissive: 0x3a2606, emissiveIntensity: 0.9 });
+    const metalMat = M({ color: 0x596069, metalness: 0.85, roughness: 0.3 });
+    const dispMat = M({ color: 0x101316, emissive: 0xf5b731, emissiveIntensity: 0.7 });
 
-  const pos = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) { pos[i * 3] = scatter[i * 3]; pos[i * 3 + 1] = scatter[i * 3 + 1]; pos[i * 3 + 2] = scatter[i * 3 + 2]; }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    addBox(g, 11, 6.4, 7, 0, 0, 0, bodyMat);              // 机身
+    addBox(g, 5.6, 4.4, 0.4, -1.6, 0, 3.55, glassMat);    // 门玻璃窗
+    addBox(g, 6.0, 4.8, 0.25, -1.6, 0, 3.35, panelMat);   // 门框
+    addBox(g, 2.6, 5.0, 0.4, 3.4, 0, 3.5, panelMat);      // 控制面板
+    addBox(g, 2.0, 0.7, 0.25, 3.4, 1.6, 3.72, dispMat);   // 显示屏
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 2; c++)
+      addBox(g, 0.55, 0.55, 0.2, 3.0 + c * 0.85, -0.4 - r * 0.85, 3.72, metalMat); // 按钮
+    addBox(g, 0.45, 4.2, 0.55, 1.0, 0, 3.7, metalMat);    // 把手
+    for (const sx of [-5, 5]) for (const sz of [-3, 3])
+      addBox(g, 0.7, 0.8, 0.7, sx, -3.6, sz, bodyMat);    // 脚
+    // 微波炉内灯
+    const lamp = new THREE.PointLight(0xf5b731, 0.6, 18);
+    lamp.position.set(-1.6, 0, 2);
+    g.add(lamp);
+    return g;
+  }
 
-  // 精致软光点
-  const tc = document.createElement("canvas"); tc.width = tc.height = 48;
-  const g = tc.getContext("2d");
-  const rg = g.createRadialGradient(24, 24, 0, 24, 24, 24);
-  rg.addColorStop(0, "rgba(255,244,214,1)");
-  rg.addColorStop(0.35, "rgba(245,183,49,0.7)");
-  rg.addColorStop(1, "rgba(245,183,49,0)");
-  g.fillStyle = rg; g.beginPath(); g.arc(24, 24, 24, 0, 6.2832); g.fill();
-  const sprite = new THREE.CanvasTexture(tc);
-  const mat = new THREE.PointsMaterial({
-    size: 0.3, map: sprite, transparent: true, opacity: 0.95,
-    blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
-  });
-  group.add(new THREE.Points(geo, mat));
+  // ---------- 服务器机柜 ----------
+  function buildServers() {
+    const g = new THREE.Group();
+    const cab = M({ color: 0x1b1e23, metalness: 0.6, roughness: 0.5 });
+    const unit = M({ color: 0x2b3038, metalness: 0.5, roughness: 0.55 });
+    const led = M({ color: 0x101316, emissive: 0xf5b731, emissiveIntensity: 0.9 });
+    const led2 = M({ color: 0x101316, emissive: 0x3fb6c8, emissiveIntensity: 0.9 });
+    addBox(g, 6, 11, 5.5, 0, 0, 0, cab);                  // 柜体
+    for (let i = 0; i < 16; i++) {
+      const y = 4.6 - i * 0.62;
+      addBox(g, 5.4, 0.46, 0.3, 0, y, 2.75, unit);        // 服务器抽屉
+      addBox(g, 0.18, 0.18, 0.12, -2.1, y, 2.95, i % 3 ? led : led2); // LED
+      addBox(g, 0.18, 0.18, 0.12, -1.7, y, 2.95, i % 2 ? led2 : led);
+    }
+    return g;
+  }
+
+  // ---------- 电厂冷却塔 ----------
+  function latheTower(profile, mat) {
+    const pts = profile.map(([x, y]) => new THREE.Vector2(x, y));
+    const m = new THREE.Mesh(new THREE.LatheGeometry(pts, 48), mat.clone());
+    m.material.side = THREE.DoubleSide;
+    return m;
+  }
+  function buildPlant() {
+    const g = new THREE.Group();
+    const concrete = M({ color: 0x8d929a, metalness: 0.1, roughness: 0.9 });
+    const dark = M({ color: 0x3a3f47, metalness: 0.3, roughness: 0.8 });
+    const steamMat = M({ color: 0xdfe6ea, metalness: 0, roughness: 1, opacity: 0.5 });
+    const profile = [[2.4, 0], [2.0, 1.6], [1.5, 3.6], [1.35, 4.6], [1.55, 6.4], [1.9, 8.2]];
+    for (const [cx, h, s] of [[-2.8, 1, 1], [2.8, 0.92, 0.92]]) {
+      const t = latheTower(profile.map(([x, y]) => [x * s, y * s]), concrete);
+      t.position.set(cx, -3.5, 0);
+      g.add(t);
+      // 蒸汽
+      for (let i = 0; i < 3; i++) {
+        const puff = new THREE.Mesh(new THREE.SphereGeometry(0.9 + i * 0.3, 12, 12), steamMat.clone());
+        puff.material.userData.base = 0.5;
+        puff.position.set(cx + (i - 1) * 0.6, -3.5 + 8.2 * s + 0.5 + i * 0.8, 0);
+        g.add(puff);
+      }
+    }
+    const ch = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 12, 24), dark.clone());
+    ch.position.set(0, 1.5, -0.5); g.add(ch);             // 烟囱
+    addBox(g, 11, 1.4, 4.5, 0, -4, 0, dark);              // 厂房底座
+    return g;
+  }
+
+  // ---------- 地球 ----------
+  function buildEarth() {
+    const g = new THREE.Group();
+    const ocean = M({ color: 0x16344e, metalness: 0.1, roughness: 0.7, emissive: 0x081726, emissiveIntensity: 0.5 });
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(6, 48, 32), ocean));
+    const grid = new THREE.Mesh(
+      new THREE.SphereGeometry(6.08, 24, 16),
+      new THREE.MeshBasicMaterial({ color: 0x3fb6c8, wireframe: true, transparent: true, opacity: 0.35 })
+    );
+    grid.material.userData.base = 0.35;
+    g.add(grid);
+    return g;
+  }
+
+  const models = [buildMicrowave(), buildServers(), buildPlant(), buildEarth()];
+  models.forEach((m, i) => { m.userData.op = i === 0 ? 1 : 0; sceneT.add(m); });
+
+  function setOpacity(group, v) {
+    group.userData.op = v;
+    group.visible = v > 0.02;
+    group.traverse((o) => { if (o.material) o.material.opacity = o.material.userData?.base != null ? o.material.userData.base * v : v; });
+  }
 
   let W = 0, H = 0;
   function resize() {
@@ -175,25 +195,14 @@ export function initScene2() {
     requestAnimationFrame(tick);
     const rect = scene.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight || W === 0) return;
-
     const band = Math.min(3, Math.floor(p * 4));
-    const lt = clamp(p * 4 - band, 0, 1);
-    let f = smooth01(lt, 0, 0.32);
-    if (band < 3) f = Math.min(f, 1 - smooth01(lt, 0.72, 1.0));
-    const form = forms[band];
-
-    for (let i = 0; i < N; i++) {
-      const j = i * 3;
-      const tx = scatter[j] * (1 - f) + form[j] * f;
-      const ty = scatter[j + 1] * (1 - f) + form[j + 1] * f;
-      const tz = scatter[j + 2] * (1 - f) + form[j + 2] * f;
-      pos[j] += (tx - pos[j]) * 0.1;
-      pos[j + 1] += (ty - pos[j + 1]) * 0.1;
-      pos[j + 2] += (tz - pos[j + 2]) * 0.1;
-    }
-    geo.attributes.position.needsUpdate = true;
-    group.rotation.y += 0.0016;
-    group.rotation.x = Math.sin(performance.now() / 6000) * 0.16;
+    models.forEach((m, i) => {
+      const target = i === band ? 1 : 0;
+      const op = m.userData.op + (target - m.userData.op) * 0.12;
+      setOpacity(m, op);
+      m.scale.setScalar(0.86 + 0.14 * op);
+      if (op > 0.02) m.rotation.y += 0.005;
+    });
     renderer.render(sceneT, cam);
   }
 
@@ -225,23 +234,17 @@ export function initScene2() {
     }
   }
 
-  function fallback2D() {
+  function fallbackMsg() {
     const ctx = canvas.getContext("2d");
-    let cw = 0, ch = 0;
     function rs() {
-      const r = canvas.getBoundingClientRect(); cw = r.width; ch = r.height;
+      const r = canvas.getBoundingClientRect();
       const dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = cw * dpr; canvas.height = ch * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = r.width * dpr; canvas.height = r.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, r.width, r.height);
+      ctx.fillStyle = "rgba(245,183,49,.85)"; ctx.font = "600 15px monospace"; ctx.textAlign = "center";
+      ctx.fillText("（当前浏览器未启用 WebGL，3D 模型无法显示）", r.width / 2, r.height / 2);
     }
     rs(); window.addEventListener("resize", rs);
-    (function loop() {
-      requestAnimationFrame(loop);
-      const rect = scene.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      ctx.clearRect(0, 0, cw, ch);
-      ctx.fillStyle = "rgba(245,183,49,.85)";
-      ctx.font = '600 16px monospace'; ctx.textAlign = 'center';
-      ctx.fillText('（当前浏览器不支持 WebGL，3D 粒子无法显示）', cw / 2, ch / 2);
-    })();
   }
 }
