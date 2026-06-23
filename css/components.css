@@ -160,7 +160,9 @@ input[type="range"].caliber::-moz-range-thumb {
 /* ================= pin 场景：第2段「数字逐级放大」================= */
 .section--scene { display: block; }       /* 含 pin 场景的段用常规文档流 */
 
-.pin-scene { position: relative; height: 460vh; }   /* 滚动行程长度（4 个聚散阶段）*/
+.pin-scene { position: relative; }
+#escalation   { height: 460vh; }   /* 第2段：4 个聚散阶段 */
+#caliberScene { height: 340vh; }   /* 第5段：3 个口径状态 */
 .pin-stage {
   position: sticky; top: 0; height: 100vh;
   display: flex; align-items: center; justify-content: center;
@@ -292,3 +294,38 @@ input[type="range"].caliber::-moz-range-thumb {
   animation: bob 2.2s var(--ease) infinite;
 }
 .escal-cue.hide { opacity: 0; }
+
+/* ---- 第5段：口径滚动场景 ---- */
+.caliber-scene { width: min(92vw, 880px); }
+.caliber-scene .slider-widget { margin: 0; }
+
+/* 被动步骤指示（非拖动控件）*/
+.cs-steps { position: relative; margin: 0 0 1.6em; padding-left: 22px; }
+.cs-steps::before {
+  content: ""; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px;
+  background: var(--ink-3);
+}
+.cs-step {
+  position: relative; padding: .35em 0; cursor: default;
+  font-family: var(--font-mono); font-size: .82rem; color: var(--text-dim);
+  transition: color .35s var(--ease);
+}
+.cs-step::before {
+  content: ""; position: absolute; left: -22px; top: .7em;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--ink-2); border: 2px solid var(--ink-3);
+  transition: all .35s var(--ease);
+}
+.cs-step.passed::before { background: var(--water); border-color: var(--water); }
+.cs-step.is-active { color: var(--water); }
+.cs-step.is-active::before {
+  background: var(--water); border-color: var(--water);
+  box-shadow: 0 0 0 4px rgba(63,182,200,.22);
+}
+
+.cs-cue {
+  margin-top: .4em; font-family: var(--font-mono); font-size: .72rem;
+  letter-spacing: .12em; color: var(--text-dim);
+  animation: bob 2.2s var(--ease) infinite; transition: opacity .5s;
+}
+.cs-cue.hide { opacity: 0; }
