@@ -3,11 +3,11 @@
    ============================================================ */
 import { initReveal } from "./reveal.js";
 import { initSlider } from "./slider.js";
-
-console.log("[云的身体] Scrollama:", typeof scrollama, " D3:", typeof d3);
+import { initScene2 } from "./scene2.js";
 
 function boot() {
   initReveal();
+  initScene2();
   initSlider();
 }
 

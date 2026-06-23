@@ -156,3 +156,72 @@ input[type="range"].caliber::-moz-range-thumb {
   .bottle-stage, .bottle-stage svg { width: 170px; }
   .bottle-stage svg { height: 340px; }
 }
+
+/* ================= pin 场景：第2段「数字逐级放大」================= */
+.section--scene { display: block; }       /* 含 pin 场景的段用常规文档流 */
+
+.pin-scene { position: relative; height: 360vh; }   /* 滚动行程长度 */
+.pin-stage {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+.escal { position: relative; text-align: center; width: min(90vw, 720px); }
+
+/* 背后放大的能量光球 */
+.escal__blob {
+  position: absolute; left: 50%; top: 42%;
+  width: 460px; height: 460px; margin: -230px 0 0 -230px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,183,49,.35), rgba(245,183,49,0) 65%);
+  transform: scale(.3); will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.escal__num {
+  position: relative;
+  font-family: var(--font-mono); font-weight: 500;
+  font-size: clamp(3.5rem, 13vw, 9rem); line-height: 1;
+  color: var(--energy); letter-spacing: -.02em;
+  text-shadow: 0 0 40px rgba(245,183,49,.4);
+}
+.escal__num .unit {
+  font-size: .26em; color: var(--text); letter-spacing: .04em; margin-left: .2em;
+}
+.escal__label {
+  position: relative; margin-top: .6em;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.1rem, 3vw, 1.7rem); color: var(--text);
+}
+.escal__cmp {
+  position: relative; margin-top: .4em;
+  font-size: 1rem; color: var(--text-dim);
+}
+
+/* 量级进度条 */
+.escal__track {
+  position: relative; margin: 2.6em auto 0; width: min(80%, 520px); height: 3px;
+  background: var(--ink-3); border-radius: 2px;
+}
+.escal__fill {
+  position: absolute; left: 0; top: 0; height: 3px; width: 0;
+  background: var(--energy); box-shadow: 0 0 12px rgba(245,183,49,.6);
+  border-radius: 2px;
+}
+.escal__ticks { position: absolute; inset: 0; }
+.escal__tick {
+  position: absolute; top: -7px; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.escal__tick i {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--ink-2); border: 2px solid var(--ink-3);
+  transition: all .3s var(--ease);
+}
+.escal__tick span {
+  font-family: var(--font-mono); font-size: .72rem; color: var(--text-dim);
+  white-space: nowrap; transition: color .3s var(--ease);
+}
+.escal__tick.on i { background: var(--energy); border-color: var(--energy); }
+.escal__tick.on span { color: var(--energy); }
