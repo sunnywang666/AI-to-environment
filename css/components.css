@@ -2,6 +2,111 @@
    云的身体 · 交互组件
    ============================================================ */
 
+/* ================= 开场 · 仿 AI 聊天框（浅色）================= */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  background: #faf9f6;
+  color: #1a1c20;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 12vh var(--gutter) 0;
+  overflow: hidden;
+}
+.hero__inner { width: 100%; max-width: 720px; text-align: center; }
+
+.hero__eyebrow {
+  font-family: var(--font-mono); font-size: .8rem; letter-spacing: .22em;
+  text-transform: uppercase; color: #9a958a; margin: 0 0 1.2em;
+}
+.hero__title {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(2rem, 5.5vw, 3.6rem); line-height: 1.12;
+  letter-spacing: -.01em; color: #20242b; margin: 0 0 1.6em;
+}
+
+/* 聊天输入框：仿真实 AI UI */
+.chatbox {
+  background: #fff; border: 1px solid #e6e2d8; border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(20,20,20,.06);
+  padding: 16px 18px 10px; text-align: left;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.chatbox:focus-within { border-color: #c9c3b4; box-shadow: 0 10px 36px rgba(20,20,20,.1); }
+.chatbox__input {
+  width: 100%; border: none; outline: none; resize: none;
+  font-family: var(--font-display); font-size: 1.08rem; line-height: 1.5;
+  color: #20242b; background: transparent; min-height: 1.6em; max-height: 6em;
+}
+.chatbox__input::placeholder { color: #b3ad9f; }
+.chatbox__bar { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.chatbox__plus {
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid #e6e2d8;
+  display: grid; place-items: center; color: #9a958a; font-size: 1.1rem;
+}
+.chatbox__flex { flex: 1; }
+.chatbox__model {
+  font-family: var(--font-mono); font-size: .74rem; color: #9a958a;
+  border: 1px solid #ece8df; border-radius: 20px; padding: 4px 10px;
+}
+.chatbox__send {
+  width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--ember); color: #fff; font-size: 1.1rem; line-height: 1;
+  display: grid; place-items: center; transition: transform .15s var(--ease), opacity .2s;
+}
+.chatbox__send:hover { transform: translateY(-1px); }
+.chatbox__send:disabled { opacity: .4; cursor: default; }
+
+/* 预设问题 chips */
+.hero__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 16px 0 0; }
+.hero__chips button {
+  font-family: var(--font-display); font-size: .9rem; color: #4a4e57;
+  background: #fff; border: 1px solid #e6e2d8; border-radius: 20px;
+  padding: 8px 16px; cursor: pointer; transition: all .2s var(--ease);
+}
+.hero__chips button:hover { border-color: var(--ember); color: var(--ember); }
+
+/* AI 打字回答 */
+.hero__answer {
+  margin: 26px auto 0; max-width: 600px; text-align: left;
+  display: flex; gap: 12px; align-items: flex-start;
+  animation: ansIn .4s var(--ease);
+}
+@keyframes ansIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.answer__avatar {
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ffd9a0, var(--ember));
+  margin-top: 2px;
+}
+.answer__text {
+  margin: 0; font-family: var(--font-display); font-size: 1.02rem; line-height: 1.7;
+  color: #2a2e35; white-space: pre-wrap;
+}
+.answer__text .num { font-family: var(--font-mono); color: var(--ember); font-weight: 500; }
+.answer__text .cursor {
+  display: inline-block; width: 7px; height: 1.05em; transform: translateY(2px);
+  background: var(--ember); margin-left: 2px; animation: caret 1s steps(2) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+.hero__scroll {
+  margin-top: 7vh; background: none; border: none; cursor: pointer;
+  font-family: var(--font-mono); font-size: .78rem; letter-spacing: .12em; color: #9a958a;
+  animation: bob 2.2s var(--ease) infinite;
+}
+.hero__scroll:hover { color: var(--ember); }
+
+/* 明→暗过渡：底部渐变沉入墨黑 */
+.hero__fade {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 30vh;
+  background: linear-gradient(to bottom, rgba(250,249,246,0), var(--ink));
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .hero__chips button { font-size: .82rem; padding: 7px 12px; }
+}
+
 /* ================= 口径滑块（第5段）================= */
 .slider-widget {
   margin: 3.5em 0 1em;

@@ -19,20 +19,51 @@
 </head>
 <body>
 
+  <!-- ============ 开场 · 仿 AI 聊天框（浅色，干净的"AI 错觉"）============ -->
+  <section class="hero" id="hero">
+    <div class="hero__inner">
+      <p class="hero__eyebrow">问 AI 一个问题</p>
+      <h1 class="hero__title">回答你这句话，<br>它要烧掉多少电？</h1>
+
+      <form class="chatbox" id="chatForm" autocomplete="off">
+        <textarea class="chatbox__input" id="chatInput" rows="1" maxlength="120"
+                  placeholder="问点什么…比如「帮我写一封一百字的邮件」"></textarea>
+        <div class="chatbox__bar">
+          <span class="chatbox__plus" aria-hidden="true">+</span>
+          <span class="chatbox__flex"></span>
+          <span class="chatbox__model">能耗估算 · 实时</span>
+          <button class="chatbox__send" id="chatSend" type="submit" aria-label="发送">↑</button>
+        </div>
+      </form>
+
+      <div class="hero__chips" id="chatChips">
+        <button type="button" data-q="帮我写一封一百字的邮件">写封邮件</button>
+        <button type="button" data-q="生成一张风景图片">生成图片</button>
+        <button type="button" data-q="做一段五秒短视频">做段视频</button>
+        <button type="button" data-q="帮我查一个资料">查个资料</button>
+      </div>
+
+      <div class="hero__answer" id="chatAnswer" hidden>
+        <span class="answer__avatar" aria-hidden="true"></span>
+        <p class="answer__text" id="answerText"></p>
+      </div>
+
+      <button class="hero__scroll" id="heroScroll" type="button">不想问？直接往下滑 ↓</button>
+    </div>
+    <div class="hero__fade" aria-hidden="true"></div>
+  </section>
+
   <!-- ============ 第 1 段 · 一次点击 ============ -->
   <section class="section section--ink" id="s1" data-chapter="1" data-glyph="spin">
     <div class="reading">
       <p class="kicker">第一段 · 一次点击</p>
-      <h1 class="title">你问了 AI<br>一个问题</h1>
-      <p class="lead">有一件看不见的事，正在发生。</p>
-      <p>微波炉嗡了一秒，一瓶水被倒空了——但你什么都没看见。AI 的"干净感"是精心设计的结果：没有烟囱、没有排气管，连加载都只是一个旋转的小圆点。</p>
-
-      <!-- 任务4：开场估算器将替换此占位 -->
-      <div class="placeholder" id="estimator-mount">[ 互动开场 · prompt 估算器 — 任务4 实现 ]</div>
-
-      <p class="lead">但 0.3 瓦时几乎等于零。一瓶水也不值一提。<br>所以——<strong>凭什么这件事需要你关心？</strong></p>
+      <h1 class="title">你刚刚问了 AI<br>一个问题</h1>
+      <p>屏幕上只有一个旋转的小圆点。没有烟囱，没有排气声，连等待都被设计成一个温柔的省略号。几秒钟后，答案出现了，干净、即时、仿佛凭空而来。</p>
+      <p>但在你看不见的某个地方，一件具体的事正在发生：成百上千张芯片为了回答你这句话而升温，风扇与冷却水把这股热量带走。折算下来——你刚才那个问题，大约用掉了 <span class="e-text">0.3 瓦时</span>电，相当于让一台微波炉转了 1 秒。</p>
+      <p>如果你让它写一封一百来字的邮件，代价会更直观：从机房的冷却，到为它发电的电厂，整条链路加起来，大约要消耗 <span class="w-text">一瓶矿泉水</span>那么多的水（约 519 毫升）。</p>
+      <p>这点东西，小到可以忽略。可正是这种"小到可以忽略"，是 AI 最危险的错觉——它没有尾气、没有烟囱，代价被精心藏在了你看不见的地方。真正的问题，从来不是这一次，是<strong>下一次，和再下一次</strong>。</p>
+      <p class="lead">0.3 瓦时几乎等于零，一瓶水也不值一提。<br>所以——<strong>凭什么，这件事需要你关心？</strong></p>
     </div>
-    <div class="scroll-hint">向下滚动 ↓</div>
   </section>
 
   <!-- ============ 第 2 段 · 一个国家的胃口 ============ -->
