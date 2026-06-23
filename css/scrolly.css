@@ -33,15 +33,59 @@
 }
 .step.is-active { opacity: 1; }
 
-/* 贯穿小圆点（through-line glyph）占位 */
+/* ---------- 贯穿小圆点（through-line glyph）·随段落变形 ---------- */
 .glyph {
-  width: 14px; height: 14px;
+  width: 16px; height: 16px;
+  display: inline-block;
+  transition: all var(--dur) var(--ease);
+}
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes meter    { 0%,100%{ transform: scaleY(.35);} 50%{ transform: scaleY(1);} }
+@keyframes pulseblur{ 0%,100%{ opacity:.5; transform: scale(.85);} 50%{ opacity:1; transform: scale(1.15);} }
+
+/* 第1段：无辜的旋转 spinner（电流琥珀）*/
+.glyph[data-state="spin"] {
   border-radius: 50%;
   border: 2px solid var(--text-dim);
   border-top-color: var(--energy);
   animation: spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* 第2段：电表指针 → 跳动的能量柱（琥珀）*/
+.glyph[data-state="meter"] {
+  width: 7px; height: 18px; border-radius: 1px;
+  background: var(--energy);
+  transform-origin: bottom center;
+  animation: meter 1.1s ease-in-out infinite;
+}
+/* 第3段：地图定位点（青，带光晕）*/
+.glyph[data-state="pin"] {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--water);
+  box-shadow: 0 0 0 4px rgba(63,182,200,.18);
+}
+/* 第4段：水滴（青）*/
+.glyph[data-state="drop"] {
+  width: 14px; height: 14px;
+  background: var(--water);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(45deg);
+}
+/* 第5段：带误差的模糊光斑（不确定性）*/
+.glyph[data-state="blur"] {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text-dim);
+  filter: blur(2px);
+  box-shadow: 0 0 8px 2px rgba(140,142,150,.45);
+  animation: pulseblur 2.2s ease-in-out infinite;
+}
+/* 第6段：回到 spinner，但慢下来 */
+.glyph[data-state="slow"] {
+  border-radius: 50%;
+  border: 2px solid var(--text-dim);
+  border-top-color: var(--energy);
+  animation: spin 3.2s linear infinite;
+}
 
 @media (max-width: 760px) {
   .scrolly { grid-template-columns: 1fr; }

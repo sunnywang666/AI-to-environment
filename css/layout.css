@@ -21,12 +21,32 @@ body {
 /* ---------- 段落容器 ---------- */
 .section {
   position: relative;
-  padding: 14vh var(--gutter);
+  min-height: 100vh;
+  padding: 12vh var(--gutter);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 渐隐渐现：由 reveal.js 按滚动位置写入 opacity / transform */
+.fade-block { will-change: opacity, transform; }
+@media (prefers-reduced-motion: reduce) {
+  .fade-block { opacity: 1 !important; transform: none !important; }
 }
 
 /* 沉浸段（墨黑）/ 编辑段（纸白）交替 */
 .section--ink   { background: var(--ink);  color: var(--text); }
-.section--paper { background: var(--paper); color: var(--text-ink); }
+/* 纸白段：上下边缘渐变回墨黑，避免与相邻沉浸段硬切；内容居中落在纸白区 */
+.section--paper {
+  background: linear-gradient(
+    to bottom,
+    var(--ink) 0%,
+    var(--paper) 24%,
+    var(--paper) 76%,
+    var(--ink) 100%
+  );
+  color: var(--text-ink);
+}
 .section--paper .meta,
 .section--paper .source { color: var(--text-ink-dim); }
 

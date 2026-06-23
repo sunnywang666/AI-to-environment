@@ -1,8 +1,10 @@
 /* ============================================================
    云的身体 · 入口
-   任务1：仅确认资源加载。任务2 起接入 Scrollama / glyph / count-up。
    ============================================================ */
+import { initReveal } from "./reveal.js";
 
-console.log("[云的身体] 骨架已加载。Scrollama:", typeof scrollama, " D3:", typeof d3);
+console.log("[云的身体] Scrollama:", typeof scrollama, " D3:", typeof d3);
 
-// 任务2 将在此导入并初始化：scroll.js / glyph.js
+document.addEventListener("DOMContentLoaded", initReveal);
+// DOMContentLoaded 可能已过（module defer），兜底立即执行一次
+if (document.readyState !== "loading") initReveal();
