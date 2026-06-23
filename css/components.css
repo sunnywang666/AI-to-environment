@@ -1,0 +1,100 @@
+/* ============================================================
+   云的身体 · 交互组件
+   ============================================================ */
+
+/* ---------------- 口径滑块（第5段）---------------- */
+.slider-widget {
+  margin: 3em 0 1em;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 3em;
+  align-items: center;
+}
+
+/* 左：水瓶可视化 */
+.slider-viz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+}
+.slider-viz svg { width: 150px; height: 300px; display: block; }
+.bottle-outline { fill: none; stroke: var(--ink-3); stroke-width: 3; }
+.bottle-water   { fill: var(--water); transition: none; }
+.bottle-cap     { fill: var(--ink-3); }
+.bottle-q {
+  fill: var(--water);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 64px;
+  opacity: 0;
+}
+
+/* 读数 */
+.slider-readout { text-align: center; }
+.slider-readout .monument {
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  color: var(--water);
+}
+.slider-readout .ratio {
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  color: var(--text-dim);
+  letter-spacing: .05em;
+  margin-top: .3em;
+}
+
+/* 右：控制 + 说明 */
+.slider-control { margin-bottom: 1.6em; }
+
+input[type="range"].caliber {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; border-radius: 2px;
+  background: var(--ink-3);
+  outline: none; margin: 0 0 1em;
+}
+input[type="range"].caliber::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--water);
+  border: 3px solid var(--ink);
+  box-shadow: 0 0 0 4px rgba(63,182,200,.2);
+  cursor: pointer;
+}
+input[type="range"].caliber::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--water); border: 3px solid var(--ink); cursor: pointer;
+}
+
+.slider-stops {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono); font-size: .74rem;
+  color: var(--text-dim);
+}
+.slider-stops button {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: inherit; font: inherit; text-align: center;
+  max-width: 33%; line-height: 1.3; transition: color var(--dur) var(--ease);
+}
+.slider-stops button:nth-child(1) { text-align: left; }
+.slider-stops button:nth-child(3) { text-align: right; }
+.slider-stops button.is-active { color: var(--water); }
+
+.boundary-label {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 1.25rem; color: var(--text); margin: 0 0 .4em;
+}
+.boundary-desc { margin: 0 0 1em; color: var(--text); }
+
+.slider-note {
+  margin-top: 1.5em; padding: 1.2em 1.4em;
+  border-left: 3px solid var(--carbon-line);
+  background: var(--ink-2);
+  font-size: .92rem; color: var(--text-dim); border-radius: 0 6px 6px 0;
+}
+.slider-note strong { color: var(--text); }
+
+@media (max-width: 760px) {
+  .slider-widget { grid-template-columns: 1fr; gap: 1.6em; }
+  .slider-viz svg { width: 110px; height: 220px; }
+}
