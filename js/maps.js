@@ -62,8 +62,8 @@ export async function initMaps() {
     const path = d3.geoPath(projection);
     inner.append("g").selectAll("path").data(geo.features).join("path")
       .attr("d", path)
-      .attr("fill", (d) => drySet.some((k) => (d.properties.name || "").includes(k)) ? "#3d3320" : "#2a313b")
-      .attr("stroke", "#5a6472").attr("stroke-width", 0.7);
+      .attr("fill", (d) => drySet.some((k) => (d.properties.name || "").includes(k)) ? "#4a3c22" : "#333c49")
+      .attr("stroke", "#6f7b8a").attr("stroke-width", 0.7);
 
     const pts = nodes.map((n) => ({ n, xy: projection([n.lon, n.lat]) })).filter((d) => d.xy);
     const ng = inner.append("g").selectAll("g.node").data(pts).join("g")
@@ -110,7 +110,7 @@ export async function initMaps() {
       if (s.country === key && s.zoom) {
         const node = (key === "cn" ? CN_NODES : US_NODES).find((n) => n.name === s.zoom);
         const xy = node && m.proj([node.lon, node.lat]);
-        if (xy) { const k = 2.2; t = `translate(${m.W / 2 - k * xy[0]},${m.H / 2 - k * xy[1]}) scale(${k})`; }
+        if (xy) { const k = 1.8; t = `translate(${m.W / 2 - k * xy[0]},${m.H / 2 - k * xy[1]}) scale(${k})`; }
       }
       m.inner.attr("transform", t);
     }
