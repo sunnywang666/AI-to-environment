@@ -1,0 +1,8 @@
+图片来源 / 署名（课程作业使用，非商业）
+
+site-abilene.jpg   OpenAI "Stargate" 得州 Abilene 数据中心站点 · 卫星影像（经 Epoch AI 报道《OpenAI Stargate: where the US sites stand》转载）
+site-michigan.jpg  美国密歇根 在建数据中心站点 · 卫星影像（经 Epoch AI 转载）
+server-rack.jpg    数据中心服务器机柜（经 Epoch AI《What you need to know about AI data centers》转载）
+cooling-plate.jpg  GPU 冷却板（经 Epoch AI 转载）
+
+注：卫星影像版权属原始影像提供方（如 Google/Maxar 等）；此处仅作课程数据新闻示意，正式发布前需替换为可商用授权图或取得许可。
