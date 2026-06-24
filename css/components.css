@@ -38,24 +38,66 @@
 .equiv__dots i.on { opacity: .9; transform: none; }
 .equiv__many p span.e-text { font-family: var(--font-mono); }
 
-/* ================= 第3段 中美双联地图 ================= */
-.maps { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; margin: 1em 0; }
-.map h4 {
-  font-family: var(--font-mono); font-size: .82rem; letter-spacing: .04em;
-  color: var(--text-dim); margin: 0 0 .4em; font-weight: 400;
+/* ================= 第3段 地图 · 滚动叙事 ================= */
+.map-scrolly { position: relative; }
+.map-scrolly__graphic {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
 }
+.map-dual {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2vw;
+  width: min(94vw, 1100px); height: 78vh;
+}
+.map { position: relative; height: 100%; overflow: hidden; transition: opacity .8s var(--ease); }
+.map.dim { opacity: .08; }
 .map svg { display: block; overflow: visible; }
-.maps__legend {
-  display: flex; flex-wrap: wrap; gap: 1.4em; margin: .6em 0 0;
-  font-family: var(--font-mono); font-size: .76rem; color: var(--text-dim);
+.mapinner { transition: transform .9s var(--ease); }
+
+.node .dot { fill: var(--energy); opacity: .5; transition: all .5s var(--ease); }
+.node .ring { opacity: .3; transition: all .5s var(--ease); }
+.node text {
+  font-family: "Noto Sans SC"; font-size: 10.5px; fill: var(--text);
+  opacity: 0; transition: opacity .5s var(--ease);
+  paint-order: stroke; stroke: var(--ink); stroke-width: 2.5px;
 }
-.maps__legend span { display: inline-flex; align-items: center; gap: .5em; }
-.maps__legend i { width: 12px; height: 12px; display: inline-block; }
-.maps__legend .dot { background: var(--energy); border-radius: 50%; box-shadow: 0 0 6px rgba(245,183,49,.6); }
-.maps__legend .ring { border: 1.5px solid var(--water); border-radius: 50%; background: transparent; }
-.maps__legend .dry { background: #2c2519; border-radius: 2px; }
+.node.hi .dot { opacity: 1; filter: drop-shadow(0 0 7px rgba(245,183,49,.85)); }
+.node.hi .ring { opacity: .9; }
+.node.hi text { opacity: .95; }
+.node.off .dot, .node.off .ring { opacity: .1; }
+.node.off text { opacity: 0; }
+
+.map-bignum {
+  position: absolute; left: 6%; top: 13%; pointer-events: none;
+  opacity: 0; transform: translateY(10px); transition: all .6s var(--ease);
+}
+.map-bignum.show { opacity: 1; transform: none; }
+.map-bignum .n {
+  display: block; font-family: var(--font-mono); font-weight: 500;
+  font-size: clamp(2.4rem, 6vw, 4.4rem); color: var(--energy);
+  text-shadow: 0 0 30px rgba(245,183,49,.4);
+}
+.map-bignum.dry .n { color: var(--water); text-shadow: 0 0 30px rgba(63,182,200,.4); }
+.map-bignum .u { font-family: var(--font-display); font-size: 1rem; color: var(--text); }
+
+/* 文字步骤：拉到地图上方滚过（负 margin）*/
+.map-scrolly__steps { position: relative; margin-top: -100vh; z-index: 3; }
+.map-scrolly .step {
+  min-height: 92vh; display: flex; align-items: center;
+  justify-content: flex-start; padding: 0 var(--gutter); opacity: 1;
+}
+.map-card {
+  max-width: 420px; padding: 1.4em 1.6em; border-radius: 12px;
+  background: rgba(12,14,17,.62); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.08);
+  font-size: 1.05rem; line-height: 1.75; color: var(--text);
+}
+.map-card strong { color: var(--energy); }
+.map-card .w-text { color: var(--water); }
+
 @media (max-width: 720px) {
-  .maps { grid-template-columns: 1fr; gap: 3vh; }
+  .map-dual { grid-template-columns: 1fr; height: 60vh; }
+  .map-card { max-width: none; }
 }
 
 /* ================= 通用图表 ================= */

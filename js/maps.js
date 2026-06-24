@@ -1,9 +1,9 @@
 /* ============================================================
-   云的身体 · 第3段 中美双联地图
-   省/州暗色底；数据中心集群=琥珀点；缺水地区染暖色、缺水节点加青环。
+   云的身体 · 第3段 中美地图 · Pudding 式滚动叙事
+   地图钉在视口；向下滚动文字分步出现，同一张地图依次飞向/高亮
+   不同区域，聚焦区高亮、其余淡掉，顶部浮现大号标注。
    ============================================================ */
 
-// Natural Earth 用英文省名；用包含匹配更稳
 const CN_DRY = ["Xinjiang", "Xizang", "Qinghai", "Gansu", "Ningxia", "Nei Mongol", "Shaanxi"];
 const US_DRY = ["Arizona", "Nevada", "Utah", "New Mexico", "California", "Colorado"];
 
@@ -27,24 +27,19 @@ const US_NODES = [
   { name: "路州 Hyperion", lon: -91.2, lat: 30.5, w: 2 },
 ];
 
+// 叙事步骤
+const STEPS = {
+  overview: { country: null, big: null, hi: null, zoom: null },
+  "us-va":   { country: "us", big: ["≈600 座", "弗吉尼亚 · 占全州 40% 用电"], hi: ["弗吉尼亚"], zoom: "弗吉尼亚" },
+  "us-clusters": { country: "us", big: ["45%", "全球用电 · 近半挤在 5 个集群"], hi: "all", zoom: null },
+  "cn-ew":   { country: "cn", big: ["8 枢纽 10 集群", "东数西算 · 算力引向西部"], hi: "all", zoom: null },
+  "cn-nx":   { country: "cn", big: ["200mm", "宁夏年降水 · 最缺水却扛最多服务器"], hi: ["宁夏·中卫"], zoom: "宁夏·中卫", dry: true },
+};
+
 export async function initMaps() {
-  const mount = document.getElementById("maps-mount");
-  if (!mount || !window.d3) return;
+  const scrolly = document.getElementById("mapScrolly");
+  if (!scrolly || !window.d3) return;
   const d3 = window.d3;
-  mount.classList.remove("placeholder");
-  mount.innerHTML = `
-    <div class="maps">
-      <div class="map" id="mapCN"><h4>中国 · 东数西算</h4></div>
-      <div class="map" id="mapUS"><h4>美国 · 五大集群</h4></div>
-    </div>
-    <div class="maps__legend">
-      <span><i class="dot"></i> 数据中心集群</span>
-      <span><i class="ring"></i> 建在缺水地区</span>
-      <span><i class="dry"></i> 缺水 / 干旱区</span>
-    </div>
-    <p class="chart__cap">把"云"钉到经纬度上——中美的大集群，<strong>很多正建在已经缺水的地方</strong>：
-    美国近一半容量挤在 5 个集群，中国"东数西算"把算力引向西部，可西部恰恰最缺水。
-    <span class="source">集群位置为示意；缺水区参考 WRI Aqueduct 干旱分布</span></p>`;
 
   let cn, us;
   try {
@@ -54,52 +49,86 @@ export async function initMaps() {
     ]);
   } catch (e) { return; }
 
-  cn.features = cn.features.filter((f) => (f.properties.name || "") !== "南海诸岛");
+  const maps = {}; // {cn:{proj,inner,W,H}, us:{...}}
 
-  function render() {
-    drawMap("#mapCN", cn, CN_NODES, CN_DRY, "name", d3.geoMercator(), true);
-    drawMap("#mapUS", us, US_NODES, US_DRY, "name", d3.geoAlbersUsa(), false);
-  }
-
-  function drawMap(sel, geo, nodes, drySet, nameKey, projection, isCN) {
-    const host = mount.querySelector(sel);
+  function build(key, host, geo, nodes, drySet, projection) {
     host.querySelectorAll("svg").forEach((s) => s.remove());
     const W = host.clientWidth || 420;
-    const H = Math.max(260, W * 0.72);
+    const H = host.clientHeight || 440;
     const svg = d3.select(host).append("svg").attr("viewBox", `0 0 ${W} ${H}`)
-      .attr("width", "100%").attr("height", H);
-
-    if (isCN) projection.fitSize([W, H * 0.98], geo);
-    else projection.fitSize([W, H], geo);
+      .attr("width", "100%").attr("height", "100%");
+    const inner = svg.append("g").attr("class", "mapinner");
+    projection.fitSize([W, H * 0.96], geo);
     const path = d3.geoPath(projection);
-
-    svg.append("g").selectAll("path").data(geo.features).join("path")
+    inner.append("g").selectAll("path").data(geo.features).join("path")
       .attr("d", path)
-      .attr("fill", (d) => drySet.some((k) => (d.properties[nameKey] || "").includes(k)) ? "#2c2519" : "#1b1f25")
-      .attr("stroke", "#3a3f48").attr("stroke-width", 0.5);
+      .attr("fill", (d) => drySet.some((k) => (d.properties.name || "").includes(k)) ? "#2c2519" : "#171b21")
+      .attr("stroke", "#333944").attr("stroke-width", 0.5);
 
-    const g = svg.append("g");
     const pts = nodes.map((n) => ({ n, xy: projection([n.lon, n.lat]) })).filter((d) => d.xy);
-    const node = g.selectAll("g.node").data(pts).join("g")
+    const ng = inner.append("g").selectAll("g.node").data(pts).join("g")
+      .attr("class", "node").attr("data-name", (d) => d.n.name)
       .attr("transform", (d) => `translate(${d.xy[0]},${d.xy[1]})`);
-    // 缺水环
-    node.filter((d) => d.n.dry).append("circle").attr("r", (d) => d.n.w * 2.4 + 5)
-      .attr("fill", "none").attr("stroke", "#3FB6C8").attr("stroke-width", 1.4).attr("opacity", 0)
-      .transition().delay((d, i) => 600 + i * 80).duration(500).attr("opacity", .8);
-    // 主点
-    node.append("circle").attr("r", 0)
-      .attr("fill", "#F5B731").style("filter", "drop-shadow(0 0 5px rgba(245,183,49,.7))")
-      .transition().delay((d, i) => i * 80).duration(500).attr("r", (d) => d.n.w * 2.2);
-    // 标签
-    node.append("text").attr("x", (d) => d.n.w * 2.2 + 4).attr("dy", ".35em")
-      .attr("font-family", "Noto Sans SC").attr("font-size", 10.5)
-      .attr("fill", "#ECEAE3").attr("opacity", 0).text((d) => d.n.name)
-      .transition().delay((d, i) => 300 + i * 80).duration(400).attr("opacity", .85);
+    ng.filter((d) => d.n.dry).append("circle").attr("class", "ring")
+      .attr("r", (d) => d.n.w * 2.2 + 5).attr("fill", "none").attr("stroke", "#3FB6C8").attr("stroke-width", 1.3);
+    ng.append("circle").attr("class", "dot").attr("r", (d) => d.n.w * 2);
+    ng.append("text").attr("x", (d) => d.n.w * 2 + 4).attr("dy", ".35em").text((d) => d.n.name);
+    maps[key] = { proj: projection, inner, W, H, host };
   }
 
+  function buildAll() {
+    build("cn", document.getElementById("mapCN"), cn, CN_NODES, CN_DRY, d3.geoMercator());
+    build("us", document.getElementById("mapUS"), us, US_NODES, US_DRY, d3.geoAlbersUsa());
+  }
+
+  const bigEl = document.getElementById("mapBig");
+
+  function focus(step) {
+    const s = STEPS[step] || STEPS.overview;
+    // 淡掉非聚焦国家
+    document.getElementById("mapCN").classList.toggle("dim", s.country === "us");
+    document.getElementById("mapUS").classList.toggle("dim", s.country === "cn");
+    // 大号标注
+    if (s.big) {
+      bigEl.querySelector(".n").textContent = s.big[0];
+      bigEl.querySelector(".u").textContent = s.big[1];
+      bigEl.classList.add("show");
+      bigEl.classList.toggle("dry", !!s.dry);
+    } else bigEl.classList.remove("show");
+    // 高亮节点 + 飞向
+    for (const key of ["cn", "us"]) {
+      const m = maps[key]; if (!m) continue;
+      const isFocus = s.country === key || s.country === null;
+      m.inner.selectAll("g.node").each(function (d) {
+        const on = isFocus && (s.hi === "all" || (s.hi && s.hi.includes(d.n.name)) || (!s.hi && s.country === null));
+        const off = isFocus && s.hi && s.hi !== "all" && !s.hi.includes(d.n.name);
+        this.classList.toggle("hi", !!on && s.hi != null);
+        this.classList.toggle("off", !!off);
+      });
+      // 缩放飞向
+      let t = "translate(0,0) scale(1)";
+      if (s.country === key && s.zoom) {
+        const node = (key === "cn" ? CN_NODES : US_NODES).find((n) => n.name === s.zoom);
+        const xy = node && m.proj([node.lon, node.lat]);
+        if (xy) { const k = 2.2; t = `translate(${m.W / 2 - k * xy[0]},${m.H / 2 - k * xy[1]}) scale(${k})`; }
+      }
+      m.inner.attr("transform", t);
+    }
+  }
+
+  buildAll();
+  focus("overview");
+
+  // 步进观察
+  const steps = [...scrolly.querySelectorAll(".step")];
   const io = new IntersectionObserver((es) => {
-    es.forEach((e) => { if (e.isIntersecting) { render(); io.disconnect(); } });
-  }, { threshold: 0.2 });
-  io.observe(mount.querySelector(".maps"));
-  window.addEventListener("resize", () => { if (mount.querySelector("svg")) render(); });
+    es.forEach((e) => { if (e.isIntersecting) focus(e.target.dataset.step); });
+  }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+  steps.forEach((s) => io.observe(s));
+
+  let rt;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { buildAll(); focus("overview"); }, 200);
+  });
 }
