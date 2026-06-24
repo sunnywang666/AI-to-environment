@@ -39,10 +39,10 @@
 .equiv__many p span.e-text { font-family: var(--font-mono); }
 
 /* ================= 第3段 地图 · 滚动叙事（全屏，无卡片）================= */
-.map-scrolly { position: relative; }
+/* 用负 gutter 抵消段落内边距→全宽（不用 transform，sticky 安全）*/
+.map-scrolly { position: relative; margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter)); }
 .map-scrolly__graphic {
   position: sticky; top: 0; height: 100vh;
-  width: 100vw; margin-left: calc(50% - 50vw);   /* 满血全屏，突破段落边距 */
   display: flex; align-items: center; justify-content: center;
 }
 /* 底部暗角，保证浮在地图上的文字可读（非卡片）*/
@@ -107,7 +107,7 @@
 
 /* ================= 全幅实景图 ================= */
 .satview {
-  margin: 6vh 0; width: 100vw; margin-left: calc(50% - 50vw);
+  margin: 6vh calc(-1 * var(--gutter));   /* 负 gutter→全宽，稳 */
   position: relative;
 }
 .satview img {

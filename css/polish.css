@@ -1,0 +1,70 @@
+/* ============================================================
+   云的身体 · 打磨层（最后加载，统一覆盖）
+   一致性收口 + 移动端降级。仅做高把握、不破坏桌面的改动。
+   ============================================================ */
+
+/* ---------- 一致性：来源/注释统一 ---------- */
+.source { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .03em; color: var(--text-dim); }
+.chart__cap { font-size: clamp(.92rem, 2.2vw, 1rem); line-height: 1.7; }
+.chart__cap .source { display: block; margin-top: .5em; }
+
+/* 防全宽元素引起的横向滚动 */
+html, body { max-width: 100%; }
+
+/* ============================================================
+   移动端（≤760px）：把全屏/sticky/双图等桌面专属布局安全降级
+   ============================================================ */
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .section { padding: 9vh var(--gutter); }
+  h1.title { font-size: clamp(2.1rem, 11vw, 3rem); }
+  h2.section-title { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+  .lead { font-size: 1.08rem; }
+
+  /* 开场聊天框 */
+  .hero { padding: 12vh var(--gutter) 12vh; }
+  .hero__chips button { font-size: .82rem; padding: 7px 12px; }
+
+  /* 第2段：大数字与字幕收敛 */
+  .escal__big { font-size: clamp(2.4rem, 13vw, 3.6rem); }
+  .escal-caption { bottom: 7vh; }
+  #escalation { height: 560vh; }
+
+  /* 第3段地图：取消 sticky/全屏飞向，改为普通堆叠，最稳 */
+  .map-scrolly { margin-left: 0; margin-right: 0; }
+  .map-scrolly__graphic {
+    position: static; height: auto; width: 100%; display: block; padding: 2vh 0;
+  }
+  .map-scrolly__graphic::after { display: none; }
+  .map-dual { grid-template-columns: 1fr; height: auto; gap: 3vh; }
+  .map { height: 52vh; }
+  .map.dim { opacity: 1; }              /* 移动端两张都显示，不淡掉 */
+  .mapinner { transform: none !important; } /* 关掉飞向缩放 */
+  .map-bignum { position: static; opacity: 1; transform: none; margin: 1.5vh 0 0; }
+  .map-bignum .n { font-size: 2.4rem; }
+  .map-scrolly__steps { margin-top: 2vh; }
+  .map-scrolly .step { min-height: auto; padding: 3vh 0; display: block; }
+  .map-card {
+    max-width: none; padding: 1em 1.2em; border-radius: 10px;
+    background: rgba(20,23,28,.7); text-shadow: none;
+    font-size: 1.02rem;
+  }
+
+  /* 满幅卫星图 */
+  .satview { margin: 4vh calc(-1 * var(--gutter)); }
+  .satview img { max-height: 56vh; }
+  .satview figcaption { font-size: .92rem; padding: 3em var(--gutter) 1.1em; }
+
+  /* 口径滑块 / 等量图：堆叠已在各自规则里，这里只收口字号 */
+  .slider-readout .monument { font-size: clamp(2.2rem, 9vw, 3rem); }
+  .equiv__dots { width: min(86vw, 320px); }
+
+  /* 纸白过渡带短一点 */
+  .band { height: 32vh; }
+  .hero-to-dark { height: 60vh; }
+}
+
+/* 尊重减弱动效偏好：关掉持续动画 */
+@media (prefers-reduced-motion: reduce) {
+  .glyph, .wave, .bubble, .escal-cue, .hero__scroll, .scroll-hint { animation: none !important; }
+}
