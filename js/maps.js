@@ -62,8 +62,8 @@ export async function initMaps() {
     const path = d3.geoPath(projection);
     inner.append("g").selectAll("path").data(geo.features).join("path")
       .attr("d", path)
-      .attr("fill", (d) => drySet.some((k) => (d.properties.name || "").includes(k)) ? "#2c2519" : "#171b21")
-      .attr("stroke", "#333944").attr("stroke-width", 0.5);
+      .attr("fill", (d) => drySet.some((k) => (d.properties.name || "").includes(k)) ? "#3d3320" : "#2a313b")
+      .attr("stroke", "#5a6472").attr("stroke-width", 0.7);
 
     const pts = nodes.map((n) => ({ n, xy: projection([n.lon, n.lat]) })).filter((d) => d.xy);
     const ng = inner.append("g").selectAll("g.node").data(pts).join("g")

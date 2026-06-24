@@ -23,9 +23,9 @@ export function initScene2() {
 
   // 4 个关键节点：数字目标 + 可见粒子目标 + 文案
   const STAGES = [
-    { op: "",                  target: 0.3,   pt: 90,   label: "一次查询 · 一台微波炉转 1 秒的电",   fmt: (v) => v.toFixed(2) + " Wh" },
-    { op: "× 25 亿次 / 天",     target: 2.5e9, pt: 700,  label: "GPT 一天 · 喂饱它的是一排排服务器",   fmt: (v) => (v / 1e8).toFixed(1) + " 亿次" },
-    { op: "× 365 天",          target: 274,   pt: 2000, label: "GPT 一年 · 要靠一座真实的电厂",       fmt: (v) => Math.round(v) + " GWh" },
+    { op: "",                  target: 0.3,   pt: 450,  label: "一次查询 · 一台微波炉转 1 秒的电",   fmt: (v) => v.toFixed(2) + " Wh" },
+    { op: "× 25 亿次 / 天",     target: 2.5e9, pt: 1500, label: "GPT 一天 · 喂饱它的是一排排服务器",   fmt: (v) => (v / 1e8).toFixed(1) + " 亿次" },
+    { op: "× 365 天",          target: 274,   pt: 2900, label: "GPT 一年 · 要靠一座真实的电厂",       fmt: (v) => Math.round(v) + " GWh" },
     { op: "＋ 全世界的数据中心",  target: 448,   pt: 4200, label: "2025 全球数据中心 · ≈ 法国全国用电",  fmt: (v) => Math.round(v) + " TWh" },
   ];
   const SEG = 1 / STAGES.length;
@@ -236,7 +236,7 @@ export function initScene2() {
   drg.addColorStop(0, "rgba(255,228,170,1)"); drg.addColorStop(1, "rgba(245,183,49,0)");
   dx.fillStyle = drg; dx.beginPath(); dx.arc(16, 16, 16, 0, 6.2832); dx.fill();
   const dust = new THREE.Points(dGeo, new THREE.PointsMaterial({
-    size: 0.22, map: new THREE.CanvasTexture(dCanvas), transparent: true, opacity: 0.5,
+    size: 0.34, map: new THREE.CanvasTexture(dCanvas), transparent: true, opacity: 0.62,
     blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
   }));
   sceneT.add(dust);
@@ -265,7 +265,7 @@ export function initScene2() {
       const target = i === st.stage ? st.nodeVis : 0;
       const op = m.userData.op + (target - m.userData.op) * 0.12;
       setOpacity(m, op);
-      m.scale.setScalar((0.86 + 0.14 * op) * 0.82);
+      m.scale.setScalar(0.82 + 0.3 * op); // 节点处更大更醒目
       if (op > 0.02) m.rotation.y += 0.005;
     });
     dGeo.setDrawRange(0, st.particles);

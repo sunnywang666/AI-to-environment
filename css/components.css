@@ -38,18 +38,25 @@
 .equiv__dots i.on { opacity: .9; transform: none; }
 .equiv__many p span.e-text { font-family: var(--font-mono); }
 
-/* ================= 第3段 地图 · 滚动叙事 ================= */
+/* ================= 第3段 地图 · 滚动叙事（全屏，无卡片）================= */
 .map-scrolly { position: relative; }
 .map-scrolly__graphic {
   position: sticky; top: 0; height: 100vh;
+  width: 100vw; margin-left: calc(50% - 50vw);   /* 满血全屏，突破段落边距 */
   display: flex; align-items: center; justify-content: center;
 }
+/* 底部暗角，保证浮在地图上的文字可读（非卡片）*/
+.map-scrolly__graphic::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40vh;
+  background: linear-gradient(to top, rgba(12,14,17,.92), transparent);
+  pointer-events: none;
+}
 .map-dual {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2vw;
-  width: min(94vw, 1100px); height: 78vh;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1vw;
+  width: 98vw; height: 92vh;
 }
 .map { position: relative; height: 100%; overflow: hidden; transition: opacity .8s var(--ease); }
-.map.dim { opacity: .08; }
+.map.dim { opacity: .12; }
 .map svg { display: block; overflow: visible; }
 .mapinner { transition: transform .9s var(--ease); }
 
@@ -79,24 +86,22 @@
 .map-bignum.dry .n { color: var(--water); text-shadow: 0 0 30px rgba(63,182,200,.4); }
 .map-bignum .u { font-family: var(--font-display); font-size: 1rem; color: var(--text); }
 
-/* 文字步骤：拉到地图上方滚过（负 margin）*/
+/* 文字步骤：拉到地图上方滚过（负 margin）；无卡片，干净文字浮在底部暗角上 */
 .map-scrolly__steps { position: relative; margin-top: -100vh; z-index: 3; }
 .map-scrolly .step {
-  min-height: 92vh; display: flex; align-items: center;
-  justify-content: flex-start; padding: 0 var(--gutter); opacity: 1;
+  min-height: 92vh; display: flex; align-items: flex-end;
+  justify-content: flex-start; padding: 0 var(--gutter) 9vh; opacity: 1;
 }
 .map-card {
-  max-width: 420px; padding: 1.4em 1.6em; border-radius: 12px;
-  background: rgba(12,14,17,.62); backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,.08);
-  font-size: 1.05rem; line-height: 1.75; color: var(--text);
+  max-width: 560px; font-size: clamp(1.05rem, 2.4vw, 1.4rem); line-height: 1.7;
+  color: var(--text); text-shadow: 0 2px 16px rgba(0,0,0,.95), 0 0 40px rgba(0,0,0,.8);
 }
+.map-card p { margin: 0; }
 .map-card strong { color: var(--energy); }
 .map-card .w-text { color: var(--water); }
 
 @media (max-width: 720px) {
-  .map-dual { grid-template-columns: 1fr; height: 60vh; }
+  .map-dual { grid-template-columns: 1fr; height: 64vh; }
   .map-card { max-width: none; }
 }
 
@@ -494,8 +499,8 @@ input[type="range"].caliber::-moz-range-thumb {
 .escal-caption .escal__op { display: inline-block; margin-bottom: .3em; }
 .escal__big {
   font-family: var(--font-mono); font-weight: 500;
-  font-size: clamp(2.4rem, 7vw, 4.6rem); line-height: 1;
-  color: var(--energy); text-shadow: 0 0 30px rgba(245,183,49,.5);
+  font-size: clamp(3.2rem, 10vw, 6.5rem); line-height: 1;
+  color: var(--energy); text-shadow: 0 0 40px rgba(245,183,49,.55);
 }
 .escal-caption .escal__label {
   margin-top: .5em; color: var(--text);
