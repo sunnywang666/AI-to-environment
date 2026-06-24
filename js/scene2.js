@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    云的身体 · 第2段「真实 3D 模型」(Three.js mesh + 灯光)
    用代码建真实 3D 模型（实体网格，非粒子拼形）：
    微波炉 → 服务器机柜 → 电厂冷却塔 → 地球
@@ -45,7 +45,7 @@ export function initScene2() {
     return {
       stage, local, climbT,
       num: cur.target * climbT,
-      particles: Math.round(prevPt + (cur.pt - prevPt) * climbT),
+      particles: Math.round(prevPt + (cur.pt - prevPt) * Math.pow(climbT, 0.6)), // ease-out:前段更快变饱满,避免爬升中段太空
       nodeVis: fadeIn * fadeOut,
     };
   }

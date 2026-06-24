@@ -21,3 +21,4 @@ reference/*.pdf
 
 # 截图调试工具（不入库）
 _shot*
+_verify/
