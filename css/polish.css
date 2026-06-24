@@ -3,6 +3,52 @@
    一致性收口 + 移动端降级。仅做高把握、不破坏桌面的改动。
    ============================================================ */
 
+/* ============================================================
+   统一排版系统（学 Pudding：固定字体角色 + 字号阶梯，全站强制）
+   角色：标题=思源黑体 / 正文=思源宋体 / 数据·标签·来源=Roboto Mono
+   ============================================================ */
+:root {
+  --fs-kicker: .82rem;
+  --fs-source: .74rem;
+  --fs-body:   1.06rem;
+  --fs-lead:   1.22rem;
+  --fs-sub:    1.3rem;   /* 小标题/边界标签 */
+  --fs-h2:     clamp(2rem, 5vw, 3.2rem);
+  --fs-h1:     clamp(2.6rem, 7vw, 5rem);
+}
+
+/* 标题：思源黑体，统一字号 */
+h1.title       { font-family: var(--font-display); font-weight: 900; font-size: var(--fs-h1); line-height: 1.06; letter-spacing: -.01em; }
+h2.section-title { font-family: var(--font-display); font-weight: 900; font-size: var(--fs-h2); line-height: 1.1; }
+
+/* 眉标 / 来源 / 图例标题：等宽 */
+.kicker, .source, .map h4, .maps__legend, .chart__cap .source,
+.slider-stops, .ratio { font-family: var(--font-mono); }
+.kicker { font-size: var(--fs-kicker); letter-spacing: .22em; }
+.source { font-size: var(--fs-source); letter-spacing: .03em; }
+
+/* 正文类：统一思源宋体 + 同一字号/行高（叙事正文、滑块说明、地图卡、图表注、注释框）*/
+.reading p, .boundary-desc, .map-card, .map-card p, .chart__cap, .slider-note {
+  font-family: var(--font-serif);
+  font-size: var(--fs-body);
+  line-height: 1.78;
+}
+.reading .lead, .map-card.lead { font-size: var(--fs-lead); line-height: 1.7; }
+
+/* 小标题 / 边界标签：思源黑体加粗，统一字号 */
+.boundary-label { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-sub); }
+
+/* 数据大字：统一 Roboto Mono（已多处是，这里兜底）*/
+.monument, .escal__big, .slider-readout .monument, .map-bignum .n, .escal__num {
+  font-family: var(--font-mono); font-weight: 500;
+}
+
+/* 强调色统一：正文里的 strong 用琥珀，水相关用青（已分散设置，这里收口）*/
+.reading strong, .map-card strong, .chart__cap strong { color: inherit; }
+
+/* —— 修 bug：聊天回答区在 hidden 时必须隐藏（CSS display 覆盖了 hidden 属性）—— */
+.hero__answer[hidden] { display: none !important; }
+
 /* ---------- 一致性：来源/注释统一 ---------- */
 .source { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .03em; color: var(--text-dim); }
 .chart__cap { font-size: clamp(.92rem, 2.2vw, 1rem); line-height: 1.7; }
