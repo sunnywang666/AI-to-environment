@@ -196,6 +196,29 @@ export function initScene2() {
   const models = [buildMicrowave(), buildServers(), buildPlant(), buildEiffel()];
   models.forEach((m, i) => { m.userData.op = i === 0 ? 1 : 0; sceneT.add(m); });
 
+  // ---------- 氛围粒子层（琥珀微尘，环绕模型缓慢飘转）----------
+  const DUST = 1100;
+  const dPos = new Float32Array(DUST * 3);
+  for (let i = 0; i < DUST; i++) {
+    const r = 11 + Math.random() * 18;
+    const a = Math.random() * Math.PI * 2, u = Math.random() * 2 - 1, s = Math.sqrt(1 - u * u);
+    dPos[i * 3] = Math.cos(a) * s * r;
+    dPos[i * 3 + 1] = u * r * 0.65;
+    dPos[i * 3 + 2] = Math.sin(a) * s * r;
+  }
+  const dGeo = new THREE.BufferGeometry();
+  dGeo.setAttribute("position", new THREE.BufferAttribute(dPos, 3));
+  const dCanvas = document.createElement("canvas"); dCanvas.width = dCanvas.height = 32;
+  const dx = dCanvas.getContext("2d");
+  const drg = dx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  drg.addColorStop(0, "rgba(255,228,170,1)"); drg.addColorStop(1, "rgba(245,183,49,0)");
+  dx.fillStyle = drg; dx.beginPath(); dx.arc(16, 16, 16, 0, 6.2832); dx.fill();
+  const dust = new THREE.Points(dGeo, new THREE.PointsMaterial({
+    size: 0.22, map: new THREE.CanvasTexture(dCanvas), transparent: true, opacity: 0.5,
+    blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+  }));
+  sceneT.add(dust);
+
   function setOpacity(group, v) {
     group.userData.op = v;
     group.visible = v > 0.02;
@@ -223,6 +246,8 @@ export function initScene2() {
       m.scale.setScalar((0.86 + 0.14 * op) * 0.82);
       if (op > 0.02) m.rotation.y += 0.005;
     });
+    dust.rotation.y -= 0.0005;
+    dust.rotation.x = Math.sin(performance.now() / 9000) * 0.1;
     renderer.render(sceneT, cam);
   }
 
