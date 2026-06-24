@@ -39,23 +39,30 @@ export function initScene2() {
     const climbT = local < CLIMB ? local / CLIMB : 1; // 爬升到 1 后冻结
     const cur = STAGES[stage];
     const prevPt = stage > 0 ? STAGES[stage - 1].pt : 0;
+    // 节点可见度：只在停顿区出现（节点处淡入、离开节点淡出）；爬升段为 0
+    const fadeIn = clamp((local - CLIMB) / 0.12, 0, 1);
+    const fadeOut = stage < STAGES.length - 1 ? 1 - clamp((local - 0.9) / 0.1, 0, 1) : 1;
     return {
       stage, local, climbT,
       num: cur.target * climbT,
       particles: Math.round(prevPt + (cur.pt - prevPt) * climbT),
+      nodeVis: fadeIn * fadeOut,
     };
   }
 
   function updateCaption() {
     st = computeState();
     const cur = STAGES[st.stage];
-    bigEl.textContent = cur.fmt(st.num);
+    bigEl.textContent = cur.fmt(st.num); // 数字始终在（爬升跳动 / 节点冻结）
     if (st.stage !== capStage) {
       opEl.textContent = cur.op;
-      opEl.classList.toggle("show", !!cur.op);
       labelEl.textContent = cur.label;
       capStage = st.stage;
     }
+    // 算符 + 标签只在节点附近出现；爬升时清空，只剩粒子 + 数字
+    opEl.classList.toggle("show", st.nodeVis > 0.3 && !!cur.op);
+    opEl.style.opacity = (cur.op ? st.nodeVis : 0).toFixed(2);
+    labelEl.style.opacity = st.nodeVis.toFixed(2);
     if (p > 0.02 && !cueHidden) { cueHidden = true; cueEl.classList.add("hide"); }
   }
   function setP(np) { p = np; updateCaption(); }
@@ -254,8 +261,8 @@ export function initScene2() {
     const rect = scene.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight || W === 0) return;
     models.forEach((m, i) => {
-      // 当前节点的模型在爬升中淡入、停顿时定格全亮
-      const target = i === st.stage ? clamp((st.local - 0.12) / 0.32, 0, 1) : 0;
+      // 模型只在节点附近出现（爬升时为 0，只剩粒子）
+      const target = i === st.stage ? st.nodeVis : 0;
       const op = m.userData.op + (target - m.userData.op) * 0.12;
       setOpacity(m, op);
       m.scale.setScalar((0.86 + 0.14 * op) * 0.82);
