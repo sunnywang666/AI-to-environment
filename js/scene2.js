@@ -19,30 +19,44 @@ export function initScene2() {
   const cueEl = document.getElementById("escCue");
   const THREE = window.THREE;
 
-  let p = 0, capBand = -1, cueHidden = false;
+  let p = 0, capStage = -1, cueHidden = false;
 
-  const CAPS = [
-    { op: "", big: "0.3 Wh", label: "一次查询 · 一台微波炉转 1 秒的电" },
-    { op: "× 25 亿次 / 天", big: null, label: "GPT 一天 · 喂饱它的是一排排服务器" },
-    { op: "× 365 天", big: "274 GWh", label: "GPT 一年 · 要靠一座真实的电厂" },
-    { op: "＋ 全世界的数据中心", big: "448 TWh", label: "2025 全球数据中心 · ≈ 法国全国用电" },
+  // 4 个关键节点：数字目标 + 可见粒子目标 + 文案
+  const STAGES = [
+    { op: "",                  target: 0.3,   pt: 90,   label: "一次查询 · 一台微波炉转 1 秒的电",   fmt: (v) => v.toFixed(2) + " Wh" },
+    { op: "× 25 亿次 / 天",     target: 2.5e9, pt: 700,  label: "GPT 一天 · 喂饱它的是一排排服务器",   fmt: (v) => (v / 1e8).toFixed(1) + " 亿次" },
+    { op: "× 365 天",          target: 274,   pt: 2000, label: "GPT 一年 · 要靠一座真实的电厂",       fmt: (v) => Math.round(v) + " GWh" },
+    { op: "＋ 全世界的数据中心",  target: 448,   pt: 4200, label: "2025 全球数据中心 · ≈ 法国全国用电",  fmt: (v) => Math.round(v) + " TWh" },
   ];
+  const SEG = 1 / STAGES.length;
+  const CLIMB = 0.55; // 前 55% 爬升、后 45% 停顿（数字冻结+模型定格）
+
+  let st = { stage: 0, local: 0, climbT: 0, num: 0, particles: 0 };
+
+  function computeState() {
+    const stage = clamp(Math.floor(p / SEG), 0, STAGES.length - 1);
+    const local = clamp((p - stage * SEG) / SEG, 0, 1);
+    const climbT = local < CLIMB ? local / CLIMB : 1; // 爬升到 1 后冻结
+    const cur = STAGES[stage];
+    const prevPt = stage > 0 ? STAGES[stage - 1].pt : 0;
+    return {
+      stage, local, climbT,
+      num: cur.target * climbT,
+      particles: Math.round(prevPt + (cur.pt - prevPt) * climbT),
+    };
+  }
 
   function updateCaption() {
-    const band = Math.min(3, Math.floor(p * 4));
-    if (band === 1) {
-      const c = clamp(map(p, 0.25, 0.5, 0, 2.5e9), 0, 2.5e9);
-      bigEl.textContent = (c / 1e8).toFixed(1) + " 亿次";
+    st = computeState();
+    const cur = STAGES[st.stage];
+    bigEl.textContent = cur.fmt(st.num);
+    if (st.stage !== capStage) {
+      opEl.textContent = cur.op;
+      opEl.classList.toggle("show", !!cur.op);
+      labelEl.textContent = cur.label;
+      capStage = st.stage;
     }
-    if (band !== capBand) {
-      const cap = CAPS[band];
-      if (cap.big) bigEl.textContent = cap.big;
-      opEl.textContent = cap.op;
-      opEl.classList.toggle("show", !!cap.op);
-      labelEl.textContent = cap.label;
-      capBand = band;
-    }
-    if (p > 0.03 && !cueHidden) { cueHidden = true; cueEl.classList.add("hide"); }
+    if (p > 0.02 && !cueHidden) { cueHidden = true; cueEl.classList.add("hide"); }
   }
   function setP(np) { p = np; updateCaption(); }
 
@@ -196,18 +210,19 @@ export function initScene2() {
   const models = [buildMicrowave(), buildServers(), buildPlant(), buildEiffel()];
   models.forEach((m, i) => { m.userData.op = i === 0 ? 1 : 0; sceneT.add(m); });
 
-  // ---------- 氛围粒子层（琥珀微尘，环绕模型缓慢飘转）----------
-  const DUST = 1100;
+  // ---------- 粒子层：数量随滚动从小到大（setDrawRange 控制可见数）----------
+  const DUST = 4200;
   const dPos = new Float32Array(DUST * 3);
   for (let i = 0; i < DUST; i++) {
-    const r = 11 + Math.random() * 18;
+    const r = 3 + Math.random() * 15;
     const a = Math.random() * Math.PI * 2, u = Math.random() * 2 - 1, s = Math.sqrt(1 - u * u);
     dPos[i * 3] = Math.cos(a) * s * r;
-    dPos[i * 3 + 1] = u * r * 0.65;
+    dPos[i * 3 + 1] = u * r * 0.8;
     dPos[i * 3 + 2] = Math.sin(a) * s * r;
   }
   const dGeo = new THREE.BufferGeometry();
   dGeo.setAttribute("position", new THREE.BufferAttribute(dPos, 3));
+  dGeo.setDrawRange(0, 0);
   const dCanvas = document.createElement("canvas"); dCanvas.width = dCanvas.height = 32;
   const dx = dCanvas.getContext("2d");
   const drg = dx.createRadialGradient(16, 16, 0, 16, 16, 16);
@@ -238,14 +253,15 @@ export function initScene2() {
     requestAnimationFrame(tick);
     const rect = scene.getBoundingClientRect();
     if (rect.bottom < 0 || rect.top > window.innerHeight || W === 0) return;
-    const band = Math.min(3, Math.floor(p * 4));
     models.forEach((m, i) => {
-      const target = i === band ? 1 : 0;
+      // 当前节点的模型在爬升中淡入、停顿时定格全亮
+      const target = i === st.stage ? clamp((st.local - 0.12) / 0.32, 0, 1) : 0;
       const op = m.userData.op + (target - m.userData.op) * 0.12;
       setOpacity(m, op);
       m.scale.setScalar((0.86 + 0.14 * op) * 0.82);
       if (op > 0.02) m.rotation.y += 0.005;
     });
+    dGeo.setDrawRange(0, st.particles);
     dust.rotation.y -= 0.0005;
     dust.rotation.x = Math.sin(performance.now() / 9000) * 0.1;
     renderer.render(sceneT, cam);

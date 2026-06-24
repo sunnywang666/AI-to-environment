@@ -329,7 +329,7 @@ input[type="range"].caliber::-moz-range-thumb {
 .section--scene { display: block; }       /* 含 pin 场景的段用常规文档流 */
 
 .pin-scene { position: relative; }
-#escalation   { height: 460vh; }   /* 第2段：4 个聚散阶段 */
+#escalation   { height: 620vh; }   /* 第2段：4 节点 × (爬升+停顿) */
 #caliberScene { height: 340vh; }   /* 第5段：3 个口径状态 */
 .pin-stage {
   position: sticky; top: 0; height: 100vh;
